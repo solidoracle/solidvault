@@ -1810,6 +1810,7 @@ __metadata:
     qrcode: ^1.5.1
     react-paginate: ^8.1.5
     solidity-coverage: ^0.8.2
+    solmate: 6.6.1
     ts-node: ^10.9.1
     typechain: ^8.1.0
     typescript: ^4.9.5
@@ -12163,6 +12164,13 @@ __metadata:
   bin:
     solidity-coverage: plugins/bin.js
   checksum: 489f73d56a1279f2394b7a14db315532884895baa00a4016e68a4e5be0eddca90a95cb3322e6a0b15e67f2d9003b9413ee24c1c61d78f558f5a2e1e233840825
+  languageName: node
+  linkType: hard
+
+"solmate@npm:6.6.1":
+  version: 6.6.1
+  resolution: "solmate@npm:6.6.1"
+  checksum: 8984eeabcc5e4b47bf37e3bc0c7fa9d358bf6cb0eb874be87572b841c9d61e8523be1e7221bdd36e87a84017ed5e08ca835728393e22ea5b7cd7be925904bf12
   languageName: node
   linkType: hard
 
