@@ -28,13 +28,12 @@ import {
 import type { NextPage } from "next";
 import { MdSettings } from "react-icons/md";
 
-// TODO: Color variables
-// TODO: React Hook Form
-// TODO: Style theme overrides eg. Tabs/Select/Modal
+// TODO: Color variables (/ color scheme)
 // TODO: Components eg. Button/Modal
 
 const Home: NextPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [slippage, setSlippage] = useState(0.5);
   return (
     <>
       <Head>
@@ -46,7 +45,7 @@ const Home: NextPage = () => {
       </Head>
       <main>
         <Container mt={10} border="1px solid" borderColor="gray.400" borderRadius={12} px={10} py={4}>
-          <Tabs width="100%">
+          <Tabs width="100%" colorScheme="purple">
             <TabList display="flex" justifyContent="space-between">
               <Box display="flex">
                 <Tab>Deposit</Tab>
@@ -142,7 +141,22 @@ const Home: NextPage = () => {
             <ModalHeader>Slippage %</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Text>Slippage</Text>
+              <Box display="flex" gap={2}>
+                <Button colorScheme="purple" variant="outline" onClick={() => setSlippage(0.5)}>
+                  0.5
+                </Button>
+                <Button colorScheme="purple" variant="outline" onClick={() => setSlippage(1.0)}>
+                  1.0
+                </Button>
+              </Box>
+              <Divider my={4} />
+              <Input
+                placeholder="Custom slippage"
+                type="number"
+                borderColor="purple.500"
+                value={slippage}
+                onChange={e => setSlippage(e.target.valueAsNumber)}
+              />
             </ModalBody>
 
             <ModalFooter>
