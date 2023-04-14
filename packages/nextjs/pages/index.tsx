@@ -28,8 +28,8 @@ import {
 import type { NextPage } from "next";
 import { MdSettings } from "react-icons/md";
 
-// TODO: Color variables (/ color scheme)
-// TODO: Components eg. Button/Modal
+// TODO: Color variables (/color scheme)
+// TODO: Componentise
 
 const Home: NextPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
