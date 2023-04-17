@@ -44,7 +44,6 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
         ERC4626(_token, "SolidVault", "SOV")
         Owned(_owner)
     {
-        console.log("SolidVault constructor called");
         aaveLendingPoolAddress = _aaveLendingPoolAddress;
         aaveRewards = _aaveRewards;
         targetFloatPercent = _targetFloatPercent;
