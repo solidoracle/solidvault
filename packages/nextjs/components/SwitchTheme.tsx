@@ -1,8 +1,10 @@
 import { useEffect } from "react";
+import { useColorMode } from "@chakra-ui/react";
 import { useDarkMode, useIsMounted } from "usehooks-ts";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 
 export const SwitchTheme = ({ className }: { className?: string }) => {
+  const { toggleColorMode } = useColorMode();
   const { isDarkMode, toggle } = useDarkMode(false);
   const isMounted = useIsMounted();
 
@@ -17,7 +19,10 @@ export const SwitchTheme = ({ className }: { className?: string }) => {
         id="theme-toggle"
         type="checkbox"
         className="toggle toggle-primary bg-primary"
-        onChange={toggle}
+        onChange={() => {
+          toggle();
+          toggleColorMode();
+        }}
         checked={isDarkMode}
       />
       {isMounted() && (
