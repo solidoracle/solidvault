@@ -118,6 +118,8 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
             // Pull enough to cover the withdrawal and reach our target float percentage.
             pullFromStrategy(floatMissingForWithdrawal + floatMissingForTarget);
         }
+
+        // TODO: what happens if underlyingAmount > totalFloat()?
     }
 
     /*///////////////////////////////////////////////////////////////

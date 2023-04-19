@@ -15,16 +15,11 @@ contract SolidVaultTest is Test {
     uint256 targetFloatPercent = 500000000000000000;
 
     function setUp() public {
-
-
         solidVault = new SolidVault(ERC20(token), address(0x01), address(0x01), address(0x01), 500000000000000000);
-
-
     }
 
     function testConstructor() public {
         assertEq(solidVault.owner(), owner);
-
     }
     
 }
