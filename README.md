@@ -2,11 +2,12 @@
 
 ## Tests
 
-To run tests, run the following command
+Create an .env file using the .env.example file as a template.
+To run tests forking from mainnet, run the following command
 
 ```bash
   cd packages/hardhat
-  forge test
+  make test
 ```
 
 # Acknowledgements
