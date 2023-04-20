@@ -37,8 +37,8 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
     uint256 public strategyBalance;
 
     // https://docs.aave.com/developers/deployed-contracts/v3-testnet-addresses
-    address immutable aaveLendingPoolAddress; 
-    address immutable aaveRewards;
+    address public immutable aaveLendingPoolAddress; 
+    address public immutable aaveRewards;
 
     constructor(ERC20 _token, address _owner, address _aaveLendingPoolAddress, address _aaveRewards, uint256 _targetFloatPercent)
         ERC4626(_token, "SolidVault", "SOV")
