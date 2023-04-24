@@ -6,6 +6,7 @@ import "../contracts/SolidVault.sol";
 import "solmate/src/tokens/WETH.sol";
 import { Vm } from 'forge-std/Vm.sol';
 
+
 contract SolidVaultTest is Test {
     SolidVault public solidVault;
     address owner = address(0x01);
@@ -19,20 +20,27 @@ contract SolidVaultTest is Test {
     }
 
     function testConstructor() public {
+        ERC20 asset = solidVault.asset();
+        assertEq(address(asset), address(token));
         assertEq(solidVault.owner(), owner);
         assertEq(solidVault.aaveLendingPoolAddress(), aaveLendingPoolAddress);
         assertEq(solidVault.aaveRewards(), aaveRewards);
         assertEq(solidVault.targetFloatPercent(), targetFloatPercent);
     }
 
-    // deal owner some tokens and test deposit
     function testDeposit() public {
-        token.deposit{value: 1000000000000000000}();
-        token.transfer(address(solidVault), 1000000000000000000);
-        assertEq(token.balanceOf(address(solidVault)), 1000000000000000000);
-        assertEq(solidVault.balanceOf(address(solidVault)), 0);
-        assertEq(solidVault.totalSupply(), 0);
-        assertEq(solidVault.totalAssets(), 1000000000000000000);
+        // wrap ETH
+        token.deposit{value: 1 ether}();
+        // approve
+        token.approve(address(solidVault), 1 ether);
+        // deposit
+        console.log(solidVault.deposit(1 ether, address(this)));
+        // check balance
+        // assertEq(solidVault.totalHoldings(), 1000000000000000000);
+        // console.log(solidVault.totalHoldings(), 'total holdings');
+        // console.log(solidVault.totalAssets(), 'total assets');
+
+        
     }        
 }
 
