@@ -88,7 +88,7 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
         // deposit assets to Aave
         // ERC20(asset).approve(aaveLendingPoolAddress, 0);
         ERC20(asset).approve(aaveLendingPoolAddress, assets);
-        
+        // we are not considering the float here -- we are depositing everything
         IPool(aaveLendingPoolAddress).supply(address(asset), assets, address(this), 0);
 
         // Increase totalHoldings to account for the deposit.
@@ -128,7 +128,7 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
 
     function pullFromStrategy(uint256 underlyingAmount) internal {
         // Get the balance of the aave strategy before we withdraw from it.
-        (uint256 totalCollateralETH, uint256 totalDebtETH, uint256 availableBorrowsETH, uint256 currentLiquidationThreshold, uint256 ltv, uint256 healthFactor) = IPool(aaveLendingPoolAddress).getUserAccountData(address(asset));
+        (uint256 totalCollateralETH, uint256 totalDebtETH, uint256 availableBorrowsETH, uint256 currentLiquidationThreshold, uint256 ltv, uint256 healthFactor) = IPool(aaveLendingPoolAddress).getUserAccountData(address(this));
         // require(totalCollateralETH == strategyBalance, "STRATEGY_BALANCE_MISMATCH"); TODO: should this hold?
 
         // We want to pull as much as we can from the strategy, but no more than we need.
