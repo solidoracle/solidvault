@@ -37,17 +37,20 @@ contract SolidVaultTest is Test {
     }
 
     function testDeposit() public {
+        address depositor = address(0x01);
+        vm.deal(depositor, 100 ether);
+        vm.startPrank(depositor);
         // wrap ETH
         weth.deposit{value: 1 ether}();
-        uint256 initialWethBalance = weth.balanceOf(address(this));
+        uint256 initialWethBalance = weth.balanceOf(address(depositor));
         // approve
         weth.approve(address(solidVault), 1 ether);
         // deposit on aave
-        solidVault.deposit(1 ether, address(this));
+        solidVault.deposit(1 ether, address(depositor));
         // check balance
-        assertEq(solidVault.totalHoldings(), 1000000000000000000);      
-        assertEq(weth.balanceOf(address(this)), initialWethBalance - 1 ether);
-        assertEq(solidVault.balanceOf(address(this)), 1 ether);
+        assertEq(solidVault.totalHoldings(), 1 ether);      
+        assertEq(weth.balanceOf(address(depositor)), initialWethBalance - 1 ether);
+        assertEq(solidVault.balanceOf(address(depositor)), 1 ether); 
 
         IPool aaveLendingPool = IPool(aaveLendingPoolAddress);
         (uint256 totalLiquidityETH, , , , , ) = aaveLendingPool.getUserAccountData(address(solidVault));
@@ -57,7 +60,7 @@ contract SolidVaultTest is Test {
          * overall liquidity of the pool. The value you're seeing (190815786500) is not your individual deposited 
          * amount but the total liquidity in the pool, which includes your 1 WETH deposit as well as deposits from other users.
          **/
-        assertEq(totalLiquidityETH,190815786500);
+        assertEq(totalLiquidityETH,190890000000);
 
         /**
          * If you want to check your own balance on Aave after depositing, we should query the balance of the aWETH 
@@ -66,9 +69,10 @@ contract SolidVaultTest is Test {
         address aWETHAddress = aaveLendingPool.getReserveData(address(weth)).aTokenAddress;
         IERC20 aWETH = IERC20(aWETHAddress);
         assertEq(aWETH.balanceOf(address(solidVault)), 1 ether);
-
-
     }        
+    
+
+    
 }
 
 

@@ -16,7 +16,7 @@ FORK_URL := ${ETH_RPC_URL}
 constructor-args := 
 
 build  :; forge build
-test   :; forge test -vvvvv --fork-url ${FORK_URL}
+test   :; forge test -vvvv --fork-url ${FORK_URL}
 trace   :; forge test -vvv --fork-url ${FORK_URL} --etherscan-api-key ${ETHERSCAN_API_KEY}
 test-contract :; forge test -vv --fork-url ${FORK_URL} --match-contract $(contract) --etherscan-api-key ${ETHERSCAN_API_KEY}
 trace-contract :; forge test -vvv --fork-url ${FORK_URL} --match-contract $(contract) --etherscan-api-key ${ETHERSCAN_API_KEY}
