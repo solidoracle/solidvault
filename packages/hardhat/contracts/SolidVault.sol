@@ -89,8 +89,6 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
         // ERC20(asset).approve(aaveLendingPoolAddress, 0);
         ERC20(asset).approve(aaveLendingPoolAddress, assets);
         
-
-        IPool(aaveLendingPoolAddress).getReserveData(address(asset));
         IPool(aaveLendingPoolAddress).supply(address(asset), assets, address(this), 0);
 
         // Increase totalHoldings to account for the deposit.
