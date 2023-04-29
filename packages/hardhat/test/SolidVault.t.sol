@@ -20,11 +20,10 @@ contract SolidVaultTest is Test {
     WETHInterface weth = WETHInterface(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     address aaveLendingPoolAddress = address(0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2); 
     address aaveRewards = address(0x8164Cc65827dcFe994AB23944CBC90e0aa80bFcb);
-    uint256 targetFloatPercent = 1e17; // 10%
     address aweth = address(0x030bA81f1c18d280636F32af80b9AAd02Cf0854e);
 
     function setUp() public {
-        solidVault = new SolidVault(ERC20(address(weth)), owner, aaveLendingPoolAddress, aaveRewards, targetFloatPercent);
+        solidVault = new SolidVault(ERC20(address(weth)), owner, aaveLendingPoolAddress, aaveRewards);
     }
 
     function testConstructor() public {
@@ -33,24 +32,21 @@ contract SolidVaultTest is Test {
         assertEq(solidVault.owner(), owner);
         assertEq(solidVault.aaveLendingPoolAddress(), aaveLendingPoolAddress);
         assertEq(solidVault.aaveRewards(), aaveRewards);
-        assertEq(solidVault.targetFloatPercent(), targetFloatPercent);
     }
 
     function testDeposit() public {
-        address depositor = address(0x01);
-        vm.deal(depositor, 100 ether);
-        vm.startPrank(depositor);
+
         // wrap ETH
         weth.deposit{value: 1 ether}();
-        uint256 initialWethBalance = weth.balanceOf(address(depositor));
+        uint256 initialWethBalance = weth.balanceOf(address(this));
         // approve
         weth.approve(address(solidVault), 1 ether);
         // deposit on aave
-        solidVault.deposit(1 ether, address(depositor));
+        solidVault.deposit(1 ether, address(this));
         // check balance
         assertEq(solidVault.totalHoldings(), 1 ether);      
-        assertEq(weth.balanceOf(address(depositor)), initialWethBalance - 1 ether);
-        assertEq(solidVault.balanceOf(address(depositor)), 1 ether); 
+        assertEq(weth.balanceOf(address(this)), initialWethBalance - 1 ether);
+        assertEq(solidVault.balanceOf(address(this)), 1 ether); 
 
         IPool aaveLendingPool = IPool(aaveLendingPoolAddress);
         (uint256 totalLiquidityETH, , , , , ) = aaveLendingPool.getUserAccountData(address(solidVault));
@@ -60,7 +56,7 @@ contract SolidVaultTest is Test {
          * overall liquidity of the pool. The value you're seeing (190815786500) is not your individual deposited 
          * amount but the total liquidity in the pool, which includes your 1 WETH deposit as well as deposits from other users.
          **/
-        assertEq(totalLiquidityETH,190890000000);
+        // assertEq(totalLiquidityETH,188763044000); // this changes on every fork
 
         /**
          * If you want to check your own balance on Aave after depositing, we should query the balance of the aWETH 
@@ -70,7 +66,24 @@ contract SolidVaultTest is Test {
         IERC20 aWETH = IERC20(aWETHAddress);
         assertEq(aWETH.balanceOf(address(solidVault)), 1 ether);
     }        
-    
+
+    function testWithdraw() public {
+        weth.deposit{value: 1 ether}();
+        // approve
+        weth.approve(address(solidVault), 1 ether);
+        // we MUST approve solidVault or other address to spend our vault tokens in case they are the ones calling withdraw
+        solidVault.approve( address(solidVault), type(uint256).max);
+
+        // deposit on aave
+        solidVault.deposit(1 ether, address(this));
+
+        // withdraw
+        uint shares = solidVault.balanceOf(address(this));
+        uint assets = solidVault.convertToAssets(shares);
+        solidVault.withdraw(assets, address(0x04), address(this)); // we are sending the withdrawn weth to address(0x04)
+        assertEq(weth.balanceOf(address(0x04)), 1 ether);
+    }
+
 
     
 }
