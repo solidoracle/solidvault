@@ -9,6 +9,7 @@ import "solmate/src/utils/SafeCastLib.sol";
 import "solmate/src/tokens/WETH.sol";
 import "./Interfaces/aave/IPool.sol";
 import "./Interfaces/aave/IRewardsController.sol";
+import {console} from "../lib/forge-std/src/console.sol";
 
 
 /**
@@ -40,41 +41,14 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
     address public immutable aaveLendingPoolAddress; 
     address public immutable aaveRewards;
 
-    constructor(ERC20 _token, address _owner, address _aaveLendingPoolAddress, address _aaveRewards, uint256 _targetFloatPercent)
+    constructor(ERC20 _token, address _owner, address _aaveLendingPoolAddress, address _aaveRewards)
         ERC4626(_token, "SolidVault", "SOV")
         Owned(_owner)
     {
         aaveLendingPoolAddress = _aaveLendingPoolAddress;
         aaveRewards = _aaveRewards;
-        targetFloatPercent = _targetFloatPercent;
         // implicitly inherited from ERC20, which is passed as an argument to the ERC4626 constructor. 
         BASE_UNIT = 10**decimals;
-    }
-
-
-    /*///////////////////////////////////////////////////////////////
-                       TARGET FLOAT CONFIGURATION
-    //////////////////////////////////////////////////////////////*/
-
-    /// @notice The desired percentage of the Vault's holdings to keep as float.
-    /// @dev A fixed point number where 1e18 represents 100% and 0 represents 0%.
-    uint256 public targetFloatPercent;
-
-    /// @notice Set a new target float percentage.
-    /// @param newTargetFloatPercent The new target float percentage.
-    function setTargetFloatPercent(uint256 newTargetFloatPercent) external onlyOwner {
-        // A target float percentage over 100% doesn't make sense.
-        require(newTargetFloatPercent <= 1e18, "TARGET_TOO_HIGH");
-
-        // Update the target float percentage.
-        targetFloatPercent = newTargetFloatPercent;
-
-    }
-
-    /// @notice Returns the amount of underlying tokens that idly sit in the Vault.
-    /// @return The amount of underlying tokens that sit idly in the Vault.
-    function totalFloat() public view returns (uint256) {
-        return asset.balanceOf(address(this));
     }
 
     /*///////////////////////////////////////////////////////////////
@@ -86,11 +60,9 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
      */
     function afterDeposit(uint256 assets, uint256) internal override nonReentrant {
         // deposit assets to Aave
-        // ERC20(asset).approve(aaveLendingPoolAddress, 0);
         ERC20(asset).approve(aaveLendingPoolAddress, assets);
-        
+        // we are not considering the float here -- we are depositing everything
         IPool(aaveLendingPoolAddress).supply(address(asset), assets, address(this), 0);
-
         // Increase totalHoldings to account for the deposit.
         totalHoldings += assets;
     }
@@ -104,60 +76,21 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
     /// @dev Only withdraws from strategies if needed and maintains the target float percentage if possible.
     /// @param underlyingAmount The amount of underlying tokens to retrieve.
     function retrieveUnderlying(uint256 underlyingAmount) internal {
-        // Get the Vault's floating balance.
-        uint256 float = totalFloat();
-
-        // If the amount is greater than the float, withdraw from strategy.
-        if (underlyingAmount > float) {
-            // Compute the amount needed to reach our target float percentage, after the withdrawal of underlyingAmount.
-            uint256 floatMissingForTarget = (totalAssets() - underlyingAmount).mulWadDown(targetFloatPercent);
-
-            // Compute the bare minimum amount we need for this withdrawal.
-            uint256 floatMissingForWithdrawal = underlyingAmount - float;
-
-            // Pull enough to cover the withdrawal and reach our target float percentage.
-            pullFromStrategy(floatMissingForWithdrawal + floatMissingForTarget);
-        }
-
-        // TODO: what happens if underlyingAmount > totalFloat()?
+        pullFromStrategy(underlyingAmount);
     }
 
     /*///////////////////////////////////////////////////////////////
                         STRATEGY WITHDRAWAL LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    function pullFromStrategy(uint256 underlyingAmount) internal {
-        // Get the balance of the aave strategy before we withdraw from it.
-        (uint256 totalCollateralETH, uint256 totalDebtETH, uint256 availableBorrowsETH, uint256 currentLiquidationThreshold, uint256 ltv, uint256 healthFactor) = IPool(aaveLendingPoolAddress).getUserAccountData(address(asset));
-        // require(totalCollateralETH == strategyBalance, "STRATEGY_BALANCE_MISMATCH"); TODO: should this hold?
+    function pullFromStrategy(uint256 underlyingAmount) public {
+        IPool(aaveLendingPoolAddress).withdraw(address(asset), underlyingAmount, address(this));
 
-        // We want to pull as much as we can from the strategy, but no more than we need.
-        uint256 amountToPull = totalCollateralETH > underlyingAmount ? underlyingAmount : totalCollateralETH;
-
-        unchecked {
-            // Compute the balance of the strategy that will remain after we withdraw.
-            // Cannot underflow as we cap the amount to pull at the strategy's balance.
-            uint256 strategyBalanceAfterWithdrawal = strategyBalance - amountToPull;
-
-            // Without this the next harvest would count the withdrawal as a loss. TODO: understand how we integrate withdraws into harvests
-            strategyBalance = strategyBalanceAfterWithdrawal.safeCastTo248();
-
-            // Withdraw from the strategy and revert if returns an error code.
-            require(IPool(aaveLendingPoolAddress).withdraw(address(asset), amountToPull, address(this)) == 0, "WITHDRAWAL_FAILED");
-        }
-        
         unchecked {
             // Account for the withdrawal done
             // Cannot underflow as the balances of some strategies cannot exceed the sum of all.
             totalHoldings -= underlyingAmount;
         }
-
-        // Cache the Vault's balance of ETH.
-        uint256 ethBalance = address(this).balance;
-
-        // If we have some ETH, wrap it into WETH.
-        // TODO: don't think this is needed -- aren't we withdrawing WETH?
-        if (ethBalance != 0) WETH(payable(address(asset))).deposit{value: ethBalance}();
     }
 
     /*///////////////////////////////////////////////////////////////
@@ -170,9 +103,6 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
         unchecked {
             totalUnderlyingHeld = totalHoldings;
         }
-
-        // Include our floating balance in the total.
-        totalUnderlyingHeld += totalFloat();
     }
     
     /*///////////////////////////////////////////////////////////////
