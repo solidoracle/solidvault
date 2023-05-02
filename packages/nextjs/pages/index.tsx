@@ -19,7 +19,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Spinner,
   Tab,
   TabList,
   TabPanels,
@@ -29,7 +28,7 @@ import type { NextPage } from "next";
 import { MdSettings } from "react-icons/md";
 import { Deposit } from "~~/components/deposit";
 import { Withdraw } from "~~/components/withdraw";
-import { useGetDataPoolsQuery } from "~~/queries/useDataPoolsQuery";
+import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 // TODO: Color variables (/color scheme)
 // TODO: Componentise
@@ -38,18 +37,21 @@ import { useGetDataPoolsQuery } from "~~/queries/useDataPoolsQuery";
 const Home: NextPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [slippage, setSlippage] = useState(0.5);
-  const { data: poolData, isLoading, isError } = useGetDataPoolsQuery(); // TODO: What is the pool address?
 
-  if (isLoading) {
-    return (
-      <Box display="flex" alignItems="center" justifyContent="center" sx={{ minHeight: "30vh" }}>
-        <Spinner size="xl" />
-      </Box>
-    );
-  }
+  const { data: poolData } = useScaffoldContractRead({
+    contractName: "SolidVault",
+    functionName: "getReserveData",
+  });
+  console.log({ poolData });
+  // if (isLoading) {
+  //   return (
+  //     <Box display="flex" alignItems="center" justifyContent="center" sx={{ minHeight: "30vh" }}>
+  //       <Spinner size="xl" />
+  //     </Box>
+  //   );
+  // }
 
-  // TODO: Update this to find the pool with the correct address
-  if (isError || !poolData?.[0]?.apy) {
+  if (!poolData?.apy) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" sx={{ minHeight: "30vh" }}>
         <Alert status="error">
