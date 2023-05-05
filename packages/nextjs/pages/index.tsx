@@ -39,7 +39,7 @@ const Home: NextPage = () => {
   const [slippage, setSlippage] = useState(0.5);
 
   const { data: poolData } = useScaffoldContractRead({
-    contractName: "SolidVault",
+    contractName: "Pool", // Does this work? https://docs.aave.com/developers/core-contracts/pool
     functionName: "getReserveData",
   });
   console.log({ poolData });
