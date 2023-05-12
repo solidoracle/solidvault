@@ -20,11 +20,14 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   */
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
+  const wethAddress = "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6";
+  const aaveLendingPoolAddress = "0x73D94B5D5C0a68Fe279a91b23D2165D2DAaA41d3";
+  const aaveRewardsAddress = "0xCCB14936C2E000ED8393A571D15A2672537838Ad";
 
   await deploy("SolidVault", {
     from: deployer,
     // Contract constructor arguments
-    args: [token, deployer, "0xb13Cfa6f8B2Eed2C37fB00fF0c1A59807C585810", "0xD0dF82dE051244f04BfF3A8bB1f62E1cD39eED92"],
+    args: [wethAddress, deployer, aaveLendingPoolAddress, aaveRewardsAddress],
     log: true,
     // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
     // automatically mining the contract deployment transaction. There is no effect on live networks.
