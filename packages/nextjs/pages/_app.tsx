@@ -17,9 +17,10 @@ import { appChains } from "~~/services/web3/wagmiConnectors";
 import "~~/styles/globals.css";
 import theme from "~~/styles/theme";
 
-// make sure FE can deposit something and withdraw something
-// start thinking about brand, landing page
-// social held to accountability
+// TODO: make sure FE can deposit and withdraw
+// TODO: post first pass on socials
+// TODO: think about branding/landing page
+
 const ScaffoldEthApp = ({ Component, pageProps }: AppProps) => {
   const [queryClient] = useState(() => new QueryClient());
   const price = useEthPrice();

@@ -31,7 +31,6 @@ import { Withdraw } from "~~/components/withdraw";
 import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
 
 // TODO: Color variables (/color scheme)
-// TODO: Componentise
 // TODO: Add a QueryLoader
 
 const Home: NextPage = () => {
@@ -39,7 +38,7 @@ const Home: NextPage = () => {
   const [slippage, setSlippage] = useState(0.5);
 
   const { data: poolData } = useScaffoldContractRead({
-    contractName: "Pool", // Does this work? https://docs.aave.com/developers/core-contracts/pool
+    contractName: "SolidVault",
     functionName: "getReserveData",
   });
   console.log({ poolData });
