@@ -25,34 +25,19 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react";
-import { ethers } from "ethers";
 import type { NextPage } from "next";
 import { MdSettings } from "react-icons/md";
-import { useAccount } from "wagmi";
 import { Deposit } from "~~/components/deposit";
 import { Withdraw } from "~~/components/withdraw";
-import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { useGetDataPoolsQuery } from "~~/queries/useGetDataPoolsQuery";
 
 // TODO: Color variables (/color scheme)
 // TODO: Add a QueryLoader
 
 const Home: NextPage = () => {
-  const { address } = useAccount();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [slippage, setSlippage] = useState(0.5);
-  const [depositValue, setDepositValue] = useState(0);
   const { data: poolData, isLoading, isError } = useGetDataPoolsQuery(); // TODO: Still not sure this is the right pool?
-
-  const { writeAsync: deposit, isLoading: isDepositLoading } = useScaffoldContractWrite({
-    contractName: "SolidVault",
-    functionName: "deposit",
-    args: [
-      depositValue.toString() == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(depositValue.toString()),
-      address,
-      ethers.utils.parseEther("0"),
-    ],
-  });
 
   if (isLoading) {
     return (
@@ -103,7 +88,7 @@ const Home: NextPage = () => {
               </Box>
             </TabList>
             <TabPanels>
-              <Deposit apy={poolData[0].apy} setDepositValue={setDepositValue} deposit={deposit} />
+              <Deposit apy={poolData[0].apy} />
               <Withdraw />
             </TabPanels>
           </Tabs>

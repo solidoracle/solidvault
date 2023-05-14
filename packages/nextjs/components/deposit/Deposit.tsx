@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import {
   Box,
   Button,
@@ -14,15 +14,29 @@ import {
   TabPanel,
   Text,
 } from "@chakra-ui/react";
+import { ethers } from "ethers";
+import { useAccount } from "wagmi";
+import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { DataPool } from "~~/services/aave/getDataPools";
 
 interface DepositProps {
   apy: DataPool["apy"];
-  setDepositValue: Dispatch<SetStateAction<number>>;
-  deposit: () => void;
 }
 
-export const Deposit = ({ apy, setDepositValue, deposit }: DepositProps) => {
+export const Deposit = ({ apy }: DepositProps) => {
+  const { address } = useAccount();
+  const [depositValue, setDepositValue] = useState(0);
+
+  const { writeAsync: deposit, isLoading: isDepositLoading } = useScaffoldContractWrite({
+    contractName: "SolidVault",
+    functionName: "deposit",
+    args: [
+      depositValue.toString() == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(depositValue.toString()),
+      address,
+      ethers.utils.parseEther("0"),
+    ],
+  });
+
   return (
     <TabPanel px={0} pt={6}>
       <form>
@@ -55,7 +69,7 @@ export const Deposit = ({ apy, setDepositValue, deposit }: DepositProps) => {
                 0.000000
               </Text>
               <Text fontSize="xl" marginBottom={0} fontWeight="medium">
-                SVT
+                SOV
               </Text>
             </Box>
             <Box display="flex">
@@ -73,7 +87,7 @@ export const Deposit = ({ apy, setDepositValue, deposit }: DepositProps) => {
             </Text>
           </Box>
         </Box>
-        <Button colorScheme="purple" width="100%" onClick={deposit}>
+        <Button colorScheme="purple" width="100%" onClick={deposit} isLoading={isDepositLoading}>
           Deposit
         </Button>
       </form>

@@ -10,7 +10,7 @@ export const Withdraw = () => {
           </GridItem>
           <GridItem>
             <Text fontSize="lg" my={0}>
-              SVT
+              SOV
             </Text>
           </GridItem>
         </Grid>
