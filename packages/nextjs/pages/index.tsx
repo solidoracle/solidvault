@@ -19,38 +19,51 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Spinner,
   Tab,
   TabList,
   TabPanels,
   Tabs,
 } from "@chakra-ui/react";
+import { ethers } from "ethers";
 import type { NextPage } from "next";
 import { MdSettings } from "react-icons/md";
+import { useAccount } from "wagmi";
 import { Deposit } from "~~/components/deposit";
 import { Withdraw } from "~~/components/withdraw";
-import { useScaffoldContractRead } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useGetDataPoolsQuery } from "~~/queries/useGetDataPoolsQuery";
 
 // TODO: Color variables (/color scheme)
 // TODO: Add a QueryLoader
 
 const Home: NextPage = () => {
+  const { address } = useAccount();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [slippage, setSlippage] = useState(0.5);
+  const [depositValue, setDepositValue] = useState(0);
+  const { data: poolData, isLoading, isError } = useGetDataPoolsQuery(); // TODO: Still not sure this is the right pool?
 
-  const { data: poolData } = useScaffoldContractRead({
+  const { writeAsync: deposit, isLoading: isDepositLoading } = useScaffoldContractWrite({
     contractName: "SolidVault",
-    functionName: "getReserveData",
+    functionName: "deposit",
+    args: [
+      depositValue.toString() == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(depositValue.toString()),
+      address,
+      ethers.utils.parseEther("0"),
+    ],
   });
-  console.log({ poolData });
-  // if (isLoading) {
-  //   return (
-  //     <Box display="flex" alignItems="center" justifyContent="center" sx={{ minHeight: "30vh" }}>
-  //       <Spinner size="xl" />
-  //     </Box>
-  //   );
-  // }
 
-  if (!poolData?.apy) {
+  if (isLoading) {
+    return (
+      <Box display="flex" alignItems="center" justifyContent="center" sx={{ minHeight: "30vh" }}>
+        <Spinner size="xl" />
+      </Box>
+    );
+  }
+
+  // TODO: Update this to find the pool with the correct address
+  if (isError || !poolData?.[0]?.apy) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" sx={{ minHeight: "30vh" }}>
         <Alert status="error">
@@ -90,7 +103,7 @@ const Home: NextPage = () => {
               </Box>
             </TabList>
             <TabPanels>
-              <Deposit apy={poolData[0].apy} />
+              <Deposit apy={poolData[0].apy} setDepositValue={setDepositValue} deposit={deposit} />
               <Withdraw />
             </TabPanels>
           </Tabs>

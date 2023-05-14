@@ -1,17 +1,44 @@
-import { Box, Button, Divider, Grid, GridItem, Input, Select, TabPanel, Text } from "@chakra-ui/react";
+import { Dispatch, SetStateAction } from "react";
+import {
+  Box,
+  Button,
+  Divider,
+  Grid,
+  GridItem,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  Select,
+  TabPanel,
+  Text,
+} from "@chakra-ui/react";
 import { DataPool } from "~~/services/aave/getDataPools";
 
 interface DepositProps {
   apy: DataPool["apy"];
+  setDepositValue: Dispatch<SetStateAction<number>>;
+  deposit: () => void;
 }
 
-export const Deposit = ({ apy }: DepositProps) => {
+export const Deposit = ({ apy, setDepositValue, deposit }: DepositProps) => {
   return (
     <TabPanel px={0} pt={6}>
       <form>
         <Grid gridTemplateColumns={"1.4fr 1fr"} gap={4} mb={5}>
           <GridItem>
-            <Input placeholder="1.5" type="number" />
+            <NumberInput
+              onChange={(stringVal, numberVal) => {
+                setDepositValue(numberVal);
+              }}
+            >
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
           </GridItem>
           <GridItem>
             <Select>
@@ -46,7 +73,7 @@ export const Deposit = ({ apy }: DepositProps) => {
             </Text>
           </Box>
         </Box>
-        <Button colorScheme="purple" width="100%">
+        <Button colorScheme="purple" width="100%" onClick={deposit}>
           Deposit
         </Button>
       </form>
