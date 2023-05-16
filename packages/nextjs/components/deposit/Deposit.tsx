@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { useAccount } from "wagmi";
-import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { DataPool } from "~~/services/aave/getDataPools";
 
 interface DepositProps {
@@ -33,9 +33,18 @@ export const Deposit = ({ apy }: DepositProps) => {
     args: [
       depositValue.toString() == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(depositValue.toString()),
       address,
-      ethers.utils.parseEther("0"),
     ],
   });
+
+  // WE NEED TO APPROVE THIS CONTRACT TO SPEND OUR TOKENS FIRST
+
+  // I USED THIS TO TEST THE CONTRACT INITIALIZATION
+  const { data: aaveRewards } = useScaffoldContractRead({
+    contractName: "SolidVault",
+    functionName: "aaveRewards",
+  });
+
+  console.log(aaveRewards, "aaveRewards");
 
   return (
     <TabPanel px={0} pt={6}>
@@ -56,8 +65,8 @@ export const Deposit = ({ apy }: DepositProps) => {
           </GridItem>
           <GridItem>
             <Select>
-              <option value="option1">WMATIC</option>
-              <option value="option2">MATIC</option>
+              <option value="option1">ETH</option>
+              <option value="option2">WETH</option>
             </Select>
           </GridItem>
         </Grid>
@@ -87,7 +96,7 @@ export const Deposit = ({ apy }: DepositProps) => {
             </Text>
           </Box>
         </Box>
-        <Button colorScheme="purple" width="100%" onClick={deposit} isLoading={isDepositLoading}>
+        <Button colorScheme="purple" width="100%" onClick={() => deposit()} isLoading={isDepositLoading}>
           Deposit
         </Button>
       </form>
