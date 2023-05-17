@@ -16,7 +16,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
-import { useAccount, useContractRead, useContractWrite } from "wagmi";
+import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
+import useApprove from "~~/hooks/other/useApprove";
 import { DataPool } from "~~/services/aave/getDataPools";
 
 interface DepositProps {
@@ -26,51 +27,15 @@ interface DepositProps {
 export const Deposit = ({ apy }: DepositProps) => {
   const { address } = useAccount();
   const [depositValue, setDepositValue] = useState(0);
+  const { wethApprove } = useApprove();
 
-  // const { writeAsync: deposit, isLoading: isDepositLoading } = useScaffoldContractWrite({
-  //   contractName: "SolidVault",
-  //   functionName: "deposit",
-  //   args: [
-  //     depositValue.toString() == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(depositValue.toString()),
-  //     address,
-  //   ],
-  // });
-
-  const { write: approve } = useContractWrite({
+  const { write: wethTransferFrom } = useContractWrite({
     address: WETH_CONTRACT_ADDRESS,
     abi: WETH_ABI,
-    functionName: "approve",
+    functionName: "transferFrom",
     mode: "recklesslyUnprepared",
-    args: [SOLIDVAULT_CONTRACT_ADDRESS, ethers.utils.parseEther(depositValue.toString())],
+    args: [address, SOLIDVAULT_CONTRACT_ADDRESS, ethers.utils.parseEther("0.000001")],
   });
-
-  const { data: allowance } = useContractRead({
-    address: WETH_CONTRACT_ADDRESS,
-    abi: WETH_ABI,
-    functionName: "approve",
-    args: [address, SOLIDVAULT_CONTRACT_ADDRESS],
-  });
-
-  console.log(allowance, "allowance");
-
-  const { write: deposit, isLoading: isDepositLoading } = useContractWrite({
-    address: SOLIDVAULT_CONTRACT_ADDRESS,
-    abi: SOLIDVAULT_ABI,
-    functionName: "deposit",
-    mode: "recklesslyUnprepared",
-    args: [
-      depositValue.toString() == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(depositValue.toString()),
-      address,
-    ],
-    onError: error => {
-      console.log(error);
-    },
-  });
-
-  const onDeposit = async () => {
-    // approve();
-    deposit();
-  };
 
   return (
     <TabPanel px={0} pt={6}>
@@ -122,9 +87,20 @@ export const Deposit = ({ apy }: DepositProps) => {
             </Text>
           </Box>
         </Box>
-        <Button colorScheme="purple" width="100%" onClick={() => onDeposit()} isLoading={isDepositLoading}>
-          Deposit
+        <Button colorScheme="purple" width="100%" onClick={() => wethApprove?.()}>
+          Approve WETH
         </Button>
+        <Button colorScheme="purple" width="100%" onClick={() => wethTransferFrom?.()}>
+          TransferFrom WETH
+        </Button>
+
+        <Button colorScheme="purple" width="100%" onClick={() => wethApprove?.()}>
+          Approve SOV
+        </Button>
+
+        {/* <Button colorScheme="purple" width="100%" onClick={() => deposit?.()}>
+          Deposit
+        </Button> */}
       </form>
     </TabPanel>
   );
