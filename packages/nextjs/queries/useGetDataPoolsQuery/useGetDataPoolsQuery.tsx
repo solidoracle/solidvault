@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { getDataPools } from "~~/services/aave";
+import { getDataPools } from "~~/services/aave/getDataPools";
 import { DataPool } from "~~/services/aave/getDataPools";
 
 export const useGetDataPoolsQuery = () => {

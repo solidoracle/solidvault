@@ -1,1 +1,0 @@
-export { getDataPools } from "./getDataPools";

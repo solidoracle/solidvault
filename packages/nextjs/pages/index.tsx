@@ -29,16 +29,15 @@ import type { NextPage } from "next";
 import { MdSettings } from "react-icons/md";
 import { Deposit } from "~~/components/deposit";
 import { Withdraw } from "~~/components/withdraw";
-import { useGetDataPoolsQuery } from "~~/queries/useDataPoolsQuery";
+import { useGetDataPoolsQuery } from "~~/queries/useGetDataPoolsQuery";
 
 // TODO: Color variables (/color scheme)
-// TODO: Componentise
 // TODO: Add a QueryLoader
 
 const Home: NextPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [slippage, setSlippage] = useState(0.5);
-  const { data: poolData, isLoading, isError } = useGetDataPoolsQuery(); // TODO: What is the pool address?
+  const { data: poolData, isLoading, isError } = useGetDataPoolsQuery(); // TODO: Still not sure this is the right pool?
 
   if (isLoading) {
     return (

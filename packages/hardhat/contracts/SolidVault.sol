@@ -162,6 +162,20 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
     }
 
     /*///////////////////////////////////////////////////////////////
+                             POOL DATA
+    //////////////////////////////////////////////////////////////*/
+
+    function getReserveData(address asset) external view returns (uint256 liquidityRate, uint40 lastUpdateTimestamp) {
+        DataTypes.ReserveData memory reserve =
+        IPool(aaveLendingPoolAddress).getReserveData(asset);
+
+        return (
+            reserve.currentLiquidityRate,
+            reserve.lastUpdateTimestamp
+        );
+    }
+
+    /*///////////////////////////////////////////////////////////////
                           RECIEVE ETHER LOGIC
     //////////////////////////////////////////////////////////////*/
 
