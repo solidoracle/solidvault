@@ -1,5 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
-import { SOLIDVAULT_ABI, SOLIDVAULT_CONTRACT_ADDRESS, WETH_ABI, WETH_CONTRACT_ADDRESS } from "./constants";
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -16,8 +15,9 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
-import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useAccount } from "wagmi";
 import useApprove from "~~/hooks/other/useApprove";
+import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { DataPool } from "~~/services/aave/getDataPools";
 
 interface DepositProps {
@@ -27,15 +27,36 @@ interface DepositProps {
 export const Deposit = ({ apy }: DepositProps) => {
   const { address } = useAccount();
   const [depositValue, setDepositValue] = useState(0);
-  const { wethApprove } = useApprove();
+  const { wethApprove, allowance } = useApprove();
+  const [isDepositing, setIsDepositing] = useState(false);
 
-  const { write: wethTransferFrom } = useContractWrite({
-    address: WETH_CONTRACT_ADDRESS,
-    abi: WETH_ABI,
-    functionName: "transferFrom",
-    mode: "recklesslyUnprepared",
-    args: [address, SOLIDVAULT_CONTRACT_ADDRESS, ethers.utils.parseEther("0.000001")],
+  const { writeAsync: deposit } = useScaffoldContractWrite({
+    contractName: "SolidVault",
+    functionName: "deposit",
+    args: [
+      depositValue.toString() == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(depositValue.toString()),
+      address,
+    ],
   });
+
+  const { data: sovBalance } = useScaffoldContractRead({
+    contractName: "SolidVault",
+    functionName: "balanceOf",
+    args: [address],
+  });
+
+  const handleDeposit = async () => {
+    setIsDepositing(true);
+
+    if (Number(ethers.utils.formatEther(allowance)) < Number(depositValue)) {
+      wethApprove?.();
+      return deposit?.();
+      setIsDepositing(false);
+    } else {
+      return deposit?.();
+      setIsDepositing(false);
+    }
+  };
 
   return (
     <TabPanel px={0} pt={6}>
@@ -66,7 +87,7 @@ export const Deposit = ({ apy }: DepositProps) => {
           <Box>
             <Box display="flex">
               <Text fontSize="xl" marginRight={2} marginBottom={0} fontWeight="medium">
-                0.000000
+                {sovBalance ? ethers.utils.formatEther(sovBalance) : "0.000"}
               </Text>
               <Text fontSize="xl" marginBottom={0} fontWeight="medium">
                 SOV
@@ -87,20 +108,9 @@ export const Deposit = ({ apy }: DepositProps) => {
             </Text>
           </Box>
         </Box>
-        <Button colorScheme="purple" width="100%" onClick={() => wethApprove?.()}>
-          Approve WETH
-        </Button>
-        <Button colorScheme="purple" width="100%" onClick={() => wethTransferFrom?.()}>
-          TransferFrom WETH
-        </Button>
-
-        <Button colorScheme="purple" width="100%" onClick={() => wethApprove?.()}>
-          Approve SOV
-        </Button>
-
-        {/* <Button colorScheme="purple" width="100%" onClick={() => deposit?.()}>
+        <Button colorScheme="purple" width="100%" onClick={handleDeposit} isLoading={isDepositing}>
           Deposit
-        </Button> */}
+        </Button>
       </form>
     </TabPanel>
   );
