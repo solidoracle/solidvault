@@ -17,14 +17,25 @@ interface WETHInterface is IERC20 {
 contract SolidVaultTest is Test {
     SolidVault public solidVault;
     address owner = address(0x01);
-    WETHInterface weth = WETHInterface(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
-    address aaveLendingPoolAddress = address(0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2); 
-    address aaveRewards = address(0x8164Cc65827dcFe994AB23944CBC90e0aa80bFcb);
-    address aweth = address(0x030bA81f1c18d280636F32af80b9AAd02Cf0854e);
+    // MAINNET CONFIG
+    // WETHInterface weth = WETHInterface(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    // address aaveLendingPoolAddress = address(0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2); 
+    // address aaveRewards = address(0x8164Cc65827dcFe994AB23944CBC90e0aa80bFcb);
+    // address aweth = address(0x030bA81f1c18d280636F32af80b9AAd02Cf0854e);
 
+    // function setUp() public {
+    //     solidVault = new SolidVault(ERC20(address(weth)), owner, aaveLendingPoolAddress, aaveRewards);
+    // }
+
+    // GOERLI CONFIG
+    WETHInterface weth = WETHInterface(0xCCB14936C2E000ED8393A571D15A2672537838Ad);
+    address aaveLendingPoolAddress = address(0x7b5C526B7F8dfdff278b4a3e045083FBA4028790); 
+    address aaveRewards = address(0xCCB14936C2E000ED8393A571D15A2672537838Ad);
+    address aweth = address(0xC93c704dCB45a70D6DA1011FfA48B3D5185201E0);
     function setUp() public {
         solidVault = new SolidVault(ERC20(address(weth)), owner, aaveLendingPoolAddress, aaveRewards);
     }
+   
 
     function testConstructor() public {
         ERC20 asset = solidVault.asset();

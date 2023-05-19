@@ -1,5 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
-import { SOLIDVAULT_ABI, SOLIDVAULT_CONTRACT_ADDRESS, WETH_ABI, WETH_CONTRACT_ADDRESS } from "./constants";
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -16,7 +15,9 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
-import { useAccount, useContractRead, useContractWrite } from "wagmi";
+import { useAccount } from "wagmi";
+import useApprove from "~~/hooks/other/useApprove";
+import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { DataPool } from "~~/services/aave/getDataPools";
 
 interface DepositProps {
@@ -26,50 +27,35 @@ interface DepositProps {
 export const Deposit = ({ apy }: DepositProps) => {
   const { address } = useAccount();
   const [depositValue, setDepositValue] = useState(0);
+  const { wethApprove, allowance } = useApprove();
+  const [isDepositing, setIsDepositing] = useState(false);
 
-  // const { writeAsync: deposit, isLoading: isDepositLoading } = useScaffoldContractWrite({
-  //   contractName: "SolidVault",
-  //   functionName: "deposit",
-  //   args: [
-  //     depositValue.toString() == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(depositValue.toString()),
-  //     address,
-  //   ],
-  // });
-
-  const { write: approve } = useContractWrite({
-    address: WETH_CONTRACT_ADDRESS,
-    abi: WETH_ABI,
-    functionName: "approve",
-    mode: "recklesslyUnprepared",
-    args: [SOLIDVAULT_CONTRACT_ADDRESS, ethers.utils.parseEther(depositValue.toString())],
-  });
-
-  const { data: allowance } = useContractRead({
-    address: WETH_CONTRACT_ADDRESS,
-    abi: WETH_ABI,
-    functionName: "approve",
-    args: [address, SOLIDVAULT_CONTRACT_ADDRESS],
-  });
-
-  console.log(allowance, "allowance");
-
-  const { write: deposit, isLoading: isDepositLoading } = useContractWrite({
-    address: SOLIDVAULT_CONTRACT_ADDRESS,
-    abi: SOLIDVAULT_ABI,
+  const { writeAsync: deposit } = useScaffoldContractWrite({
+    contractName: "SolidVault",
     functionName: "deposit",
-    mode: "recklesslyUnprepared",
     args: [
       depositValue.toString() == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(depositValue.toString()),
       address,
     ],
-    onError: error => {
-      console.log(error);
-    },
   });
 
-  const onDeposit = async () => {
-    // approve();
-    deposit();
+  const { data: sovBalance } = useScaffoldContractRead({
+    contractName: "SolidVault",
+    functionName: "balanceOf",
+    args: [address],
+  });
+
+  const handleDeposit = async () => {
+    setIsDepositing(true);
+
+    if (Number(ethers.utils.formatEther(allowance)) < Number(depositValue)) {
+      wethApprove?.();
+      return deposit?.();
+      setIsDepositing(false);
+    } else {
+      return deposit?.();
+      setIsDepositing(false);
+    }
   };
 
   return (
@@ -101,7 +87,7 @@ export const Deposit = ({ apy }: DepositProps) => {
           <Box>
             <Box display="flex">
               <Text fontSize="xl" marginRight={2} marginBottom={0} fontWeight="medium">
-                0.000000
+                {sovBalance ? ethers.utils.formatEther(sovBalance) : "0.000"}
               </Text>
               <Text fontSize="xl" marginBottom={0} fontWeight="medium">
                 SOV
@@ -122,7 +108,7 @@ export const Deposit = ({ apy }: DepositProps) => {
             </Text>
           </Box>
         </Box>
-        <Button colorScheme="purple" width="100%" onClick={() => onDeposit()} isLoading={isDepositLoading}>
+        <Button colorScheme="purple" width="100%" onClick={handleDeposit} isLoading={isDepositing}>
           Deposit
         </Button>
       </form>

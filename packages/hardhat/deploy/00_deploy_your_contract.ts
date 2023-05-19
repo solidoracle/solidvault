@@ -20,9 +20,9 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   */
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
-  const wethAddress = "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6";
-  const aaveLendingPoolAddress = "0x73D94B5D5C0a68Fe279a91b23D2165D2DAaA41d3";
-  const aaveRewardsAddress = "0xCCB14936C2E000ED8393A571D15A2672537838Ad";
+  const wethAddress = "0xCCB14936C2E000ED8393A571D15A2672537838Ad";
+  const aaveLendingPoolAddress = "0x7b5C526B7F8dfdff278b4a3e045083FBA4028790";
+  const aaveRewardsAddress = "0x12Ff6eba0767076B056cD722aC8817D771bbCB97";
 
   await deploy("SolidVault", {
     from: deployer,

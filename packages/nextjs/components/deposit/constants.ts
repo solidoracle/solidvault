@@ -1,6 +1,6 @@
-export const WETH_CONTRACT_ADDRESS = "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6";
+export const WETH_CONTRACT_ADDRESS = "0xCCB14936C2E000ED8393A571D15A2672537838Ad";
 
-export const SOLIDVAULT_CONTRACT_ADDRESS = "0x34bB5834f9559E5bdF293ba4269249683CdA6b03";
+export const SOLIDVAULT_CONTRACT_ADDRESS = "0x75e045C15D91f5310d886Ea96AffdD3Bf182c29E";
 
 export const SOLIDVAULT_ABI = [
   {
@@ -389,30 +389,6 @@ export const SOLIDVAULT_ABI = [
       },
     ],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "asset",
-        type: "address",
-      },
-    ],
-    name: "getReserveData",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "liquidityRate",
-        type: "uint256",
-      },
-      {
-        internalType: "uint40",
-        name: "lastUpdateTimestamp",
-        type: "uint40",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
