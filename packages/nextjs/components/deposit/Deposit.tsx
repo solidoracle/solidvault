@@ -1,5 +1,10 @@
-import { useState } from "react";
+import { useDeposit } from "../../hooks/other/useDeposit";
+import { useSovBalance } from "../../hooks/other/useSovBalance";
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
   Divider,
@@ -14,10 +19,6 @@ import {
   TabPanel,
   Text,
 } from "@chakra-ui/react";
-import { ethers } from "ethers";
-import { useAccount } from "wagmi";
-import useApprove from "~~/hooks/other/useApprove";
-import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { DataPool } from "~~/services/aave/getDataPools";
 
 interface DepositProps {
@@ -25,38 +26,20 @@ interface DepositProps {
 }
 
 export const Deposit = ({ apy }: DepositProps) => {
-  const { address } = useAccount();
-  const [depositValue, setDepositValue] = useState(0);
-  const { wethApprove, allowance } = useApprove();
-  const [isDepositing, setIsDepositing] = useState(false);
+  const { handleDeposit, isLoading, isError, depositValue, setDepositValue } = useDeposit();
+  const { sovBalance } = useSovBalance();
 
-  const { writeAsync: deposit } = useScaffoldContractWrite({
-    contractName: "SolidVault",
-    functionName: "deposit",
-    args: [
-      depositValue.toString() == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(depositValue.toString()),
-      address,
-    ],
-  });
-
-  const { data: sovBalance } = useScaffoldContractRead({
-    contractName: "SolidVault",
-    functionName: "balanceOf",
-    args: [address],
-  });
-
-  const handleDeposit = async () => {
-    setIsDepositing(true);
-
-    if (Number(ethers.utils.formatEther(allowance)) < Number(depositValue)) {
-      wethApprove?.();
-      return deposit?.();
-      setIsDepositing(false);
-    } else {
-      return deposit?.();
-      setIsDepositing(false);
-    }
-  };
+  if (isError) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" sx={{ minHeight: "30vh" }}>
+        <Alert status="error">
+          <AlertIcon />
+          <AlertTitle>Unable to allow deposits</AlertTitle>
+          <AlertDescription>Please try again later.</AlertDescription>
+        </Alert>
+      </Box>
+    );
+  }
 
   return (
     <TabPanel px={0} pt={6}>
@@ -64,7 +47,8 @@ export const Deposit = ({ apy }: DepositProps) => {
         <Grid gridTemplateColumns={"1.4fr 1fr"} gap={4} mb={5}>
           <GridItem>
             <NumberInput
-              onChange={(stringVal, numberVal) => {
+              min={0}
+              onChange={(_stringVal, numberVal) => {
                 setDepositValue(numberVal);
               }}
             >
@@ -87,7 +71,7 @@ export const Deposit = ({ apy }: DepositProps) => {
           <Box>
             <Box display="flex">
               <Text fontSize="xl" marginRight={2} marginBottom={0} fontWeight="medium">
-                {sovBalance ? ethers.utils.formatEther(sovBalance) : "0.000"}
+                {sovBalance}
               </Text>
               <Text fontSize="xl" marginBottom={0} fontWeight="medium">
                 SOV
@@ -108,7 +92,13 @@ export const Deposit = ({ apy }: DepositProps) => {
             </Text>
           </Box>
         </Box>
-        <Button colorScheme="purple" width="100%" onClick={handleDeposit} isLoading={isDepositing}>
+        <Button
+          colorScheme="purple"
+          width="100%"
+          onClick={handleDeposit}
+          isDisabled={depositValue <= 0}
+          isLoading={isLoading}
+        >
           Deposit
         </Button>
       </form>
