@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useScaffoldContractWrite } from '../scaffold-eth';
 import { ethers } from 'ethers';
 import { useAccount } from 'wagmi';
@@ -10,12 +10,6 @@ export const useDeposit = () => {
   const [depositValue, setDepositValue] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-
-  useEffect(() => {
-    if (!wethApprove) {
-      setIsError(true);
-    }
-  }, []);
 
   const handleDepositValue = () => {
     if (!depositValue || depositValue === 0) {
@@ -34,16 +28,13 @@ export const useDeposit = () => {
     setIsLoading(true);
 
     if (!wethApprove) {
+      // TODO: Make error a string value not boolean so different errors can be returned
       setIsError(true);
       return;
     }
 
-    if (Number(ethers.utils.formatEther(allowance)) < Number(depositValue)) {
-      wethApprove();
-      deposit();
-      setIsLoading(false);
-      return;
-    } else {
+    // TODO: Add error here if allowance < depositValue
+    if (Number(ethers.utils.formatEther(allowance)) > Number(depositValue)) {
       deposit();
       setIsLoading(false);
       return;

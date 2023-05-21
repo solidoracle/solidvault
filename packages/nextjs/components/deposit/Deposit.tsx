@@ -19,86 +19,99 @@ import {
   TabPanel,
   Text,
 } from '@chakra-ui/react';
+import { ethers } from 'ethers';
+import { useNetwork } from 'wagmi';
+import useApprove from '~~/hooks/other/useApprove';
 import { DataPool } from '~~/services/aave/getDataPools';
 
 interface DepositProps {
   apy: DataPool['apy'];
 }
+// Allowance = allowed amount to spend
+// Check if deposit value < allowance amount
+// If invalid allowance amount disable the button
 
 export const Deposit = ({ apy }: DepositProps) => {
+  // TODO: Is it possible to track approves? Can we show a loading spinner whilst it's happening? Can we rerender so the approve button is removed?
+  const { wethApprove, allowance } = useApprove();
   const { handleDeposit, isLoading, isError, depositValue, setDepositValue } = useDeposit();
   const { sovBalance } = useSovBalance();
 
   return (
     <TabPanel px={0} pt={6}>
-      {isError ? (
-        <Error />
-      ) : (
-        <form>
-          <Grid gridTemplateColumns={'1.4fr 1fr'} gap={4} mb={5}>
-            <GridItem>
-              <NumberInput
-                min={0}
-                onChange={(_stringVal, numberVal) => {
-                  setDepositValue(numberVal);
-                }}>
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </GridItem>
-            <GridItem>
-              <Select>
-                <option value="option1">ETH</option>
-                <option value="option2">WETH</option>
-              </Select>
-            </GridItem>
-          </Grid>
-          <Divider orientation="horizontal" />
-          <Box display="flex" justifyContent="space-between">
-            <Box>
-              <Box display="flex">
-                <Text fontSize="xl" marginRight={2} marginBottom={0} fontWeight="medium">
-                  {sovBalance}
-                </Text>
-                <Text fontSize="xl" marginBottom={0} fontWeight="medium">
-                  SOV
-                </Text>
-              </Box>
-              <Box display="flex">
-                <Text fontSize="md" marginRight={2} marginTop={0} fontWeight="medium" color="gray.400">
-                  Minimum:
-                </Text>
-                <Text fontSize="md" marginTop={0} fontWeight="medium" color="gray.400">
-                  0.000000
-                </Text>
-              </Box>
+      {isError && <Error />}
+      <form>
+        <Grid gridTemplateColumns={'1.4fr 1fr'} gap={4} mb={5}>
+          <GridItem>
+            <NumberInput
+              min={0}
+              onChange={(_stringVal, numberVal) => {
+                setDepositValue(numberVal);
+              }}>
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </GridItem>
+          <GridItem>
+            <Select>
+              <option value="option1">ETH</option>
+              <option value="option2">WETH</option>
+            </Select>
+          </GridItem>
+        </Grid>
+        <Divider orientation="horizontal" />
+        <Box display="flex" justifyContent="space-between">
+          <Box>
+            <Box display="flex">
+              <Text fontSize="xl" marginRight={2} marginBottom={0} fontWeight="medium">
+                {/* TODO: This should be the amount of SOV you will receive based on the depositValue */}
+                {sovBalance}
+              </Text>
+              <Text fontSize="xl" marginBottom={0} fontWeight="medium">
+                SOV
+              </Text>
             </Box>
-            <Box alignSelf="end">
-              <Text fontSize="md" fontWeight="medium" color="gray.400">
-                {apy}% APY
+            <Box display="flex">
+              {/* TODO: Do we need the minimum amount? */}
+              <Text fontSize="md" marginRight={2} marginTop={0} fontWeight="medium" color="gray.400">
+                Minimum:
+              </Text>
+              <Text fontSize="md" marginTop={0} fontWeight="medium" color="gray.400">
+                0.000000
               </Text>
             </Box>
           </Box>
-          <Button
-            colorScheme="purple"
-            width="100%"
-            onClick={handleDeposit}
-            isDisabled={depositValue <= 0}
-            isLoading={isLoading}>
-            Deposit
+          <Box alignSelf="end">
+            <Text fontSize="md" fontWeight="medium" color="gray.400">
+              {apy}% APY
+            </Text>
+          </Box>
+        </Box>
+        {Number(ethers.utils.formatEther(allowance)) === 0 ||
+        Number(depositValue) > Number(ethers.utils.formatEther(allowance)) ? (
+          <Button colorScheme="green" mb="2" width="100%" onClick={wethApprove}>
+            Approve
           </Button>
-        </form>
-      )}
+        ) : null}
+        <Button
+          colorScheme="purple"
+          width="100%"
+          onClick={handleDeposit}
+          isDisabled={depositValue <= 0 || isError || Number(ethers.utils.formatEther(allowance)) === 0}
+          isLoading={isLoading}>
+          Deposit
+        </Button>
+      </form>
     </TabPanel>
   );
 };
 
 const Error = () => {
   return (
-    <Box>
+    <Box mb="6">
       <Alert status="error">
         <AlertIcon />
         <AlertTitle>Unable to allow deposits</AlertTitle>

@@ -3,6 +3,7 @@ import { BigNumber, ethers } from 'ethers';
 import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { SOLIDVAULT_CONTRACT_ADDRESS, WETH_ABI, WETH_CONTRACT_ADDRESS } from '~~/components/deposit/constants';
 
+// TODO: Should these be Scaffold ETH hooks?
 export default function useApprove() {
   const [allowance, setAllowance] = useState(BigNumber.from('0'));
   const { address } = useAccount();
