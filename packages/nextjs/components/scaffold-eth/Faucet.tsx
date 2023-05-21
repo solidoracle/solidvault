@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { ethers } from "ethers";
-import { useNetwork } from "wagmi";
-import { hardhat, localhost } from "wagmi/chains";
-import { BanknotesIcon } from "@heroicons/react/24/outline";
-import { Address, AddressInput, Balance, EtherInput, getParsedEthersError } from "~~/components/scaffold-eth";
-import { useTransactor } from "~~/hooks/scaffold-eth";
-import { getLocalProvider, notification } from "~~/utils/scaffold-eth";
-import { contracts } from "~~/utils/scaffold-eth/contract";
+import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
+import { useNetwork } from 'wagmi';
+import { hardhat, localhost } from 'wagmi/chains';
+import { BanknotesIcon } from '@heroicons/react/24/outline';
+import { Address, AddressInput, Balance, EtherInput, getParsedEthersError } from '~~/components/scaffold-eth';
+import { useTransactor } from '~~/hooks/scaffold-eth';
+import { getLocalProvider, notification } from '~~/utils/scaffold-eth';
+import { contracts } from '~~/utils/scaffold-eth/contract';
 
 // Account index to use from generated hardhat accounts.
 const FAUCET_ACCOUNT_INDEX = 0;
@@ -16,9 +16,9 @@ const FAUCET_ACCOUNT_INDEX = 0;
  */
 export const Faucet = () => {
   const [loading, setLoading] = useState(false);
-  const [inputAddress, setInputAddress] = useState("");
-  const [faucetAddress, setFaucetAddress] = useState("");
-  const [sendValue, setSendValue] = useState("");
+  const [inputAddress, setInputAddress] = useState('');
+  const [faucetAddress, setFaucetAddress] = useState('');
+  const [sendValue, setSendValue] = useState('');
 
   const { chain: ConnectedChain } = useNetwork();
   const provider = getLocalProvider(localhost);
@@ -39,7 +39,7 @@ export const Faucet = () => {
             <p className="m-0">Did you forget to run `yarn chain`?</p>
           </>,
         );
-        console.error("⚡️ ~ file: Faucet.tsx:getFaucetAddress ~ error", error);
+        console.error('⚡️ ~ file: Faucet.tsx:getFaucetAddress ~ error', error);
       }
     };
     getFaucetAddress();
@@ -50,11 +50,11 @@ export const Faucet = () => {
       setLoading(true);
       await faucetTxn({ to: inputAddress, value: ethers.utils.parseEther(sendValue) });
       setLoading(false);
-      setInputAddress("");
-      setSendValue("");
+      setInputAddress('');
+      setSendValue('');
     } catch (error) {
       const parsedError = getParsedEthersError(error);
-      console.error("⚡️ ~ file: Faucet.tsx:sendETH ~ error", error);
+      console.error('⚡️ ~ file: Faucet.tsx:sendETH ~ error', error);
       notification.error(parsedError);
       setLoading(false);
     }
@@ -69,8 +69,7 @@ export const Faucet = () => {
     <div>
       <label
         htmlFor="faucet-modal"
-        className="btn btn-primary btn-sm px-2 rounded-full font-normal space-x-2 normal-case"
-      >
+        className="btn btn-primary btn-sm px-2 rounded-full font-normal space-x-2 normal-case">
         <BanknotesIcon className="h-4 w-4" />
         <span>Faucet</span>
       </label>
@@ -103,11 +102,10 @@ export const Faucet = () => {
               <EtherInput placeholder="Amount to send" value={sendValue} onChange={value => setSendValue(value)} />
               <button
                 className={`h-10 btn btn-primary btn-sm px-2 rounded-full space-x-3 ${
-                  loading ? "loading before:!w-4 before:!h-4 before:!mx-0" : ""
+                  loading ? 'loading before:!w-4 before:!h-4 before:!mx-0' : ''
                 }`}
                 onClick={sendETH}
-                disabled={loading}
-              >
+                disabled={loading}>
                 {!loading && <BanknotesIcon className="h-6 w-6" />}
                 <span>Send</span>
               </button>

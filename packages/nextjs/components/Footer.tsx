@@ -1,9 +1,9 @@
-import { hardhat } from "wagmi/chains";
-import { CurrencyDollarIcon } from "@heroicons/react/24/outline";
-import { SwitchTheme } from "~~/components/SwitchTheme";
-import { Faucet } from "~~/components/scaffold-eth";
-import { useAppStore } from "~~/services/store/store";
-import { getTargetNetwork } from "~~/utils/scaffold-eth";
+import { hardhat } from 'wagmi/chains';
+import { CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { SwitchTheme } from '~~/components/SwitchTheme';
+import { Faucet } from '~~/components/scaffold-eth';
+import { useAppStore } from '~~/services/store/store';
+import { getTargetNetwork } from '~~/utils/scaffold-eth';
 
 /**
  * Site footer
@@ -36,26 +36,23 @@ export const Footer = () => {
                 href="https://twitter.com/solidoracle"
                 target="_blank"
                 rel="noreferrer"
-                className="underline underline-offset-2"
-              >
+                className="underline underline-offset-2">
                 solidoracle
-              </a>{" "}
-              and{" "}
+              </a>{' '}
+              and{' '}
               <a
                 href="https://twitter.com/woodelliot"
                 target="_blank"
                 rel="noreferrer"
-                className="underline underline-offset-2"
-              >
+                className="underline underline-offset-2">
                 Elliot Wood
               </a>
-              , built using{" "}
+              , built using{' '}
               <a
                 href="https://github.com/solidoracle/solidvault"
                 target="_blank"
                 rel="noreferrer"
-                className="underline underline-offset-2"
-              >
+                className="underline underline-offset-2">
                 Scaffold-Eth 2
               </a>
               🏗

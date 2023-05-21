@@ -1,5 +1,5 @@
-import { AvatarComponent } from "@rainbow-me/rainbowkit";
-import Blockies from "react-blockies";
+import { AvatarComponent } from '@rainbow-me/rainbowkit';
+import Blockies from 'react-blockies';
 
 // Custom Avatar for RainbowKit
 export const BlockieAvatar: AvatarComponent = ({ address, ensImage, size }) =>

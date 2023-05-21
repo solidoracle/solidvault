@@ -1,14 +1,14 @@
-import { Dispatch, SetStateAction } from "react";
-import { Contract, utils } from "ethers";
-import { FunctionFragment } from "ethers/lib/utils";
-import { DisplayVariable, ReadOnlyFunctionForm, WriteOnlyFunctionForm } from "~~/components/scaffold-eth";
+import { Dispatch, SetStateAction } from 'react';
+import { Contract, utils } from 'ethers';
+import { FunctionFragment } from 'ethers/lib/utils';
+import { DisplayVariable, ReadOnlyFunctionForm, WriteOnlyFunctionForm } from '~~/components/scaffold-eth';
 
 /**
  * @param {Contract} contract
  * @returns {FunctionFragment[]} array of function fragments
  */
 const getAllContractFunctions = (contract: Contract | null): FunctionFragment[] => {
-  return contract ? Object.values(contract.interface.functions).filter(fn => fn.type === "function") : [];
+  return contract ? Object.values(contract.interface.functions).filter(fn => fn.type === 'function') : [];
 };
 
 /**
@@ -29,7 +29,7 @@ const getContractVariablesAndNoParamsReadMethods = (
       ? contractMethodsAndVariables
           .map(fn => {
             const isQueryableWithNoParams =
-              (fn.stateMutability === "view" || fn.stateMutability === "pure") && fn.inputs.length === 0;
+              (fn.stateMutability === 'view' || fn.stateMutability === 'pure') && fn.inputs.length === 0;
             if (isQueryableWithNoParams) {
               return (
                 <DisplayVariable
@@ -63,7 +63,7 @@ const getContractReadOnlyMethodsWithParams = (
       ? contractMethodsAndVariables
           .map((fn, idx) => {
             const isQueryableWithParams =
-              (fn.stateMutability === "view" || fn.stateMutability === "pure") && fn.inputs.length > 0;
+              (fn.stateMutability === 'view' || fn.stateMutability === 'pure') && fn.inputs.length > 0;
             if (isQueryableWithParams) {
               return (
                 <ReadOnlyFunctionForm
@@ -97,7 +97,7 @@ const getContractWriteMethods = (
     methods: contract
       ? contractMethodsAndVariables
           .map((fn, idx) => {
-            const isWriteableFunction = fn.stateMutability !== "view" && fn.stateMutability !== "pure";
+            const isWriteableFunction = fn.stateMutability !== 'view' && fn.stateMutability !== 'pure';
             if (isWriteableFunction) {
               return (
                 <WriteOnlyFunctionForm
@@ -124,7 +124,7 @@ const getContractWriteMethods = (
  */
 const getFunctionInputKey = (functionInfo: FunctionFragment, input: utils.ParamType, inputIndex: number): string => {
   const name = input?.name || `input_${inputIndex}_`;
-  return functionInfo.name + "_" + name + "_" + input.type + "_" + input.baseType;
+  return functionInfo.name + '_' + name + '_' + input.type + '_' + input.baseType;
 };
 
 /**
@@ -145,7 +145,7 @@ const getParsedEthersError = (e: any): string => {
     message = e.message;
   }
 
-  console.log("Attempt to clean up:", message);
+  console.log('Attempt to clean up:', message);
   try {
     const obj = JSON.parse(message);
     if (obj && obj.body) {
@@ -170,14 +170,14 @@ const getParsedContractFunctionArgs = (form: Record<string, any>) => {
   const keys = Object.keys(form);
   const parsedArguments = keys.map(key => {
     try {
-      const keySplitArray = key.split("_");
+      const keySplitArray = key.split('_');
       const baseTypeOfArg = keySplitArray[keySplitArray.length - 1];
       let valueOfArg = form[key];
 
-      if (["array", "tuple"].includes(baseTypeOfArg)) {
+      if (['array', 'tuple'].includes(baseTypeOfArg)) {
         valueOfArg = JSON.parse(valueOfArg);
-      } else if (baseTypeOfArg === "bool") {
-        if (["true", "1", "0x1", "0x01", "0x0001"].includes(valueOfArg)) {
+      } else if (baseTypeOfArg === 'bool') {
+        if (['true', '1', '0x1', '0x01', '0x0001'].includes(valueOfArg)) {
           valueOfArg = 1;
         } else {
           valueOfArg = 0;

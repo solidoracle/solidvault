@@ -1,4 +1,4 @@
-import { connectorsForWallets } from "@rainbow-me/rainbowkit";
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {
   braveWallet,
   coinbaseWallet,
@@ -6,14 +6,14 @@ import {
   metaMaskWallet,
   rainbowWallet,
   walletConnectWallet,
-} from "@rainbow-me/rainbowkit/wallets";
-import { configureChains } from "wagmi";
-import * as chains from "wagmi/chains";
-import { alchemyProvider } from "wagmi/providers/alchemy";
-import { publicProvider } from "wagmi/providers/public";
-import scaffoldConfig from "~~/scaffold.config";
-import { burnerWalletConfig } from "~~/services/web3/wagmi-burner/burnerWalletConfig";
-import { getTargetNetwork } from "~~/utils/scaffold-eth";
+} from '@rainbow-me/rainbowkit/wallets';
+import { configureChains } from 'wagmi';
+import * as chains from 'wagmi/chains';
+import { alchemyProvider } from 'wagmi/providers/alchemy';
+import { publicProvider } from 'wagmi/providers/public';
+import scaffoldConfig from '~~/scaffold.config';
+import { burnerWalletConfig } from '~~/services/web3/wagmi-burner/burnerWalletConfig';
+import { getTargetNetwork } from '~~/utils/scaffold-eth';
 
 const configuredNetwork = getTargetNetwork();
 const burnerConfig = scaffoldConfig.burnerWallet;
@@ -50,7 +50,7 @@ const wallets = [
   walletConnectWallet({ chains: appChains.chains }),
   ledgerWallet({ chains: appChains.chains }),
   braveWallet({ chains: appChains.chains }),
-  coinbaseWallet({ appName: "scaffold-eth", chains: appChains.chains }),
+  coinbaseWallet({ appName: 'scaffold-eth', chains: appChains.chains }),
   rainbowWallet({ chains: appChains.chains }),
 ];
 
@@ -59,7 +59,7 @@ const wallets = [
  */
 export const wagmiConnectors = connectorsForWallets([
   {
-    groupName: "Supported Wallets",
+    groupName: 'Supported Wallets',
     wallets: burnerConfig.enabled ? [...wallets, burnerWalletConfig({ chains: [appChains.chains[0]] })] : wallets,
   },
 ]);

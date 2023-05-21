@@ -1,6 +1,6 @@
-import { useCallback } from "react";
-import { ethers } from "ethers";
-import { CommonInputProps, InputBase } from "~~/components/scaffold-eth";
+import { useCallback } from 'react';
+import { ethers } from 'ethers';
+import { CommonInputProps, InputBase } from '~~/components/scaffold-eth';
 
 export const BytesInput = ({ value, onChange, name, placeholder }: CommonInputProps) => {
   const convertStringToBytes = useCallback(() => {
@@ -20,8 +20,7 @@ export const BytesInput = ({ value, onChange, name, placeholder }: CommonInputPr
       suffix={
         <div
           className="self-center cursor-pointer text-xl font-semibold px-4 text-accent"
-          onClick={convertStringToBytes}
-        >
+          onClick={convertStringToBytes}>
           #
         </div>
       }

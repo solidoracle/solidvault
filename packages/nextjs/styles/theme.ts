@@ -1,8 +1,8 @@
-import { tabsTheme } from "../components/Tabs";
-import { extendTheme } from "@chakra-ui/react";
+import { tabsTheme } from '../components/Tabs';
+import { extendTheme } from '@chakra-ui/react';
 
 const theme = extendTheme({
-  initialColorMode: "system",
+  initialColorMode: 'system',
   useSystemColorMode: true,
   components: {
     Tabs: tabsTheme,

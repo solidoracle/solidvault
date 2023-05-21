@@ -1,19 +1,19 @@
-import { useState } from "react";
-import { FunctionFragment } from "ethers/lib/utils";
-import { useContractRead } from "wagmi";
+import { useState } from 'react';
+import { FunctionFragment } from 'ethers/lib/utils';
+import { useContractRead } from 'wagmi';
 import {
   ContractInput,
   displayTxResult,
   getFunctionInputKey,
   getParsedContractFunctionArgs,
-} from "~~/components/scaffold-eth";
-import { getTargetNetwork, notification } from "~~/utils/scaffold-eth";
+} from '~~/components/scaffold-eth';
+import { getTargetNetwork, notification } from '~~/utils/scaffold-eth';
 
 const getInitialFormState = (functionFragment: FunctionFragment) => {
   const initialForm: Record<string, any> = {};
   functionFragment.inputs.forEach((input, inputIndex) => {
     const key = getFunctionInputKey(functionFragment, input, inputIndex);
-    initialForm[key] = "";
+    initialForm[key] = '';
   });
   return initialForm;
 };
@@ -68,12 +68,11 @@ export const ReadOnlyFunctionForm = ({ functionFragment, contractAddress }: TRea
           )}
         </div>
         <button
-          className={`btn btn-secondary btn-sm ${isFetching ? "loading" : ""}`}
+          className={`btn btn-secondary btn-sm ${isFetching ? 'loading' : ''}`}
           onClick={async () => {
             const { data } = await refetch();
             setResult(data);
-          }}
-        >
+          }}>
           Read 📡
         </button>
       </div>

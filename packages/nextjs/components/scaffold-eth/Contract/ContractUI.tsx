@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
-import { Abi } from "abitype";
-import { useContract, useProvider } from "wagmi";
-import { Spinner } from "~~/components/Spinner";
+import { useMemo, useState } from 'react';
+import { Abi } from 'abitype';
+import { useContract, useProvider } from 'wagmi';
+import { Spinner } from '~~/components/Spinner';
 import {
   Address,
   Balance,
@@ -9,10 +9,10 @@ import {
   getContractReadOnlyMethodsWithParams,
   getContractVariablesAndNoParamsReadMethods,
   getContractWriteMethods,
-} from "~~/components/scaffold-eth";
-import { useDeployedContractInfo, useNetworkColor } from "~~/hooks/scaffold-eth";
-import { getTargetNetwork } from "~~/utils/scaffold-eth";
-import { ContractName } from "~~/utils/scaffold-eth/contract";
+} from '~~/components/scaffold-eth';
+import { useDeployedContractInfo, useNetworkColor } from '~~/hooks/scaffold-eth';
+import { getTargetNetwork } from '~~/utils/scaffold-eth';
+import { ContractName } from '~~/utils/scaffold-eth/contract';
 
 type ContractUIProps = {
   contractName: ContractName;
@@ -22,7 +22,7 @@ type ContractUIProps = {
 /**
  * UI component to interface with deployed contracts.
  **/
-export const ContractUI = ({ contractName, className = "" }: ContractUIProps) => {
+export const ContractUI = ({ contractName, className = '' }: ContractUIProps) => {
   const provider = useProvider();
   const [refreshDisplayVariables, setRefreshDisplayVariables] = useState(false);
   const configuredNetwork = getTargetNetwork();
@@ -84,13 +84,13 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
             </div>
             {configuredNetwork && (
               <p className="my-0 text-sm">
-                <span className="font-bold">Network</span>:{" "}
+                <span className="font-bold">Network</span>:{' '}
                 <span style={{ color: networkColor }}>{configuredNetwork.name}</span>
               </p>
             )}
           </div>
           <div className="bg-base-300 rounded-3xl px-6 lg:px-8 py-4 shadow-lg shadow-base-300">
-            {contractVariablesDisplay.methods.length > 0 ? contractVariablesDisplay.methods : "No contract variables"}
+            {contractVariablesDisplay.methods.length > 0 ? contractVariablesDisplay.methods : 'No contract variables'}
           </div>
         </div>
         <div className="col-span-1 lg:col-span-2 flex flex-col gap-6">
@@ -102,7 +102,7 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
                 </div>
               </div>
               <div className="p-5 divide-y divide-base-300">
-                {contractMethodsDisplay.methods.length > 0 ? contractMethodsDisplay.methods : "No read methods"}
+                {contractMethodsDisplay.methods.length > 0 ? contractMethodsDisplay.methods : 'No read methods'}
               </div>
             </div>
           </div>
@@ -114,7 +114,7 @@ export const ContractUI = ({ contractName, className = "" }: ContractUIProps) =>
                 </div>
               </div>
               <div className="p-5 divide-y divide-base-300">
-                {contractWriteMethods.methods.length > 0 ? contractWriteMethods.methods : "No write methods"}
+                {contractWriteMethods.methods.length > 0 ? contractWriteMethods.methods : 'No write methods'}
               </div>
             </div>
           </div>

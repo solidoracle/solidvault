@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import { isENS } from "../utils/isEns";
-import { isAddress } from "ethers/lib/utils";
-import Blockies from "react-blockies";
-import { useEnsAddress, useEnsAvatar, useEnsName } from "wagmi";
-import { CommonInputProps, InputBase } from "~~/components/scaffold-eth";
+import { useCallback, useEffect, useState } from 'react';
+import { isENS } from '../utils/isEns';
+import { isAddress } from 'ethers/lib/utils';
+import Blockies from 'react-blockies';
+import { useEnsAddress, useEnsAvatar, useEnsName } from 'wagmi';
+import { CommonInputProps, InputBase } from '~~/components/scaffold-eth';
 
 /**
  * Address input with ENS name resolution

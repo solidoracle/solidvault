@@ -1,8 +1,8 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import { Balance, BlockieAvatar } from "~~/components/scaffold-eth";
-import { useAutoConnect, useNetworkColor } from "~~/hooks/scaffold-eth";
-import { getTargetNetwork } from "~~/utils/scaffold-eth";
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ChevronDownIcon } from '@heroicons/react/24/solid';
+import { Balance, BlockieAvatar } from '~~/components/scaffold-eth';
+import { useAutoConnect, useNetworkColor } from '~~/hooks/scaffold-eth';
+import { getTargetNetwork } from '~~/utils/scaffold-eth';
 
 /**
  * Custom Wagmi Connect Button (watch balance + custom design)
@@ -55,8 +55,7 @@ export const RainbowKitCustomConnectButton = () => {
                     <button
                       onClick={openAccountModal}
                       type="button"
-                      className="btn btn-secondary btn-sm pl-0 pr-2 shadow-md"
-                    >
+                      className="btn btn-secondary btn-sm pl-0 pr-2 shadow-md">
                       <BlockieAvatar address={account.address} size={24} ensImage={account.ensAvatar} />
                       <span className="ml-2 mr-1">{account.displayName}</span>
                       <span>

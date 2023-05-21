@@ -1,10 +1,10 @@
-import React, { useCallback, useRef, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
-import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
-import { useOutsideClick } from "~~/hooks/scaffold-eth";
+import React, { useCallback, useRef, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { Bars3Icon, BugAntIcon } from '@heroicons/react/24/outline';
+import { FaucetButton, RainbowKitCustomConnectButton } from '~~/components/scaffold-eth';
+import { useOutsideClick } from '~~/hooks/scaffold-eth';
 
 const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => {
   const router = useRouter();
@@ -15,9 +15,8 @@ const NavLink = ({ href, children }: { href: string; children: React.ReactNode }
       href={href}
       passHref
       className={`${
-        isActive ? "bg-secondary shadow-md" : ""
-      } hover:bg-secondary hover:shadow-md focus:bg-secondary py-1.5 px-3 text-sm rounded-full gap-2`}
-    >
+        isActive ? 'bg-secondary shadow-md' : ''
+      } hover:bg-secondary hover:shadow-md focus:bg-secondary py-1.5 px-3 text-sm rounded-full gap-2`}>
       {children}
     </Link>
   );
@@ -53,11 +52,10 @@ export const Header = () => {
       <div className="navbar-start w-auto lg:w-1/2">
         <div className="lg:hidden dropdown" ref={burgerMenuRef}>
           <button
-            className={`ml-1 btn btn-ghost ${isDrawerOpen ? "hover:bg-secondary" : "hover:bg-transparent"}`}
+            className={`ml-1 btn btn-ghost ${isDrawerOpen ? 'hover:bg-secondary' : 'hover:bg-transparent'}`}
             onClick={() => {
               setIsDrawerOpen(prevIsOpenState => !prevIsOpenState);
-            }}
-          >
+            }}>
             <Bars3Icon className="h-1/2" />
           </button>
           {isDrawerOpen && (
@@ -66,8 +64,7 @@ export const Header = () => {
               className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
               onClick={() => {
                 setIsDrawerOpen(false);
-              }}
-            >
+              }}>
               {navLinks}
             </ul>
           )}

@@ -1,10 +1,10 @@
-import { TransactionReceipt, TransactionRequest, TransactionResponse } from "@ethersproject/abstract-provider";
-import { SendTransactionResult } from "@wagmi/core";
-import { Signer } from "ethers";
-import { Deferrable } from "ethers/lib/utils";
-import { useSigner } from "wagmi";
-import { getParsedEthersError } from "~~/components/scaffold-eth";
-import { getBlockExplorerTxLink, notification } from "~~/utils/scaffold-eth";
+import { TransactionReceipt, TransactionRequest, TransactionResponse } from '@ethersproject/abstract-provider';
+import { SendTransactionResult } from '@wagmi/core';
+import { Signer } from 'ethers';
+import { Deferrable } from 'ethers/lib/utils';
+import { useSigner } from 'wagmi';
+import { getParsedEthersError } from '~~/components/scaffold-eth';
+import { getBlockExplorerTxLink, notification } from '~~/utils/scaffold-eth';
 
 type TTransactionFunc = (
   tx: Promise<SendTransactionResult> | Deferrable<TransactionRequest> | undefined,
@@ -41,8 +41,8 @@ export const useTransactor = (_signer?: Signer): TTransactionFunc => {
 
   const result: TTransactionFunc = async (tx, callback) => {
     if (!signer) {
-      notification.error("Wallet/Signer not connected");
-      console.error("⚡️ ~ file: useTransactor.tsx ~ error");
+      notification.error('Wallet/Signer not connected');
+      console.error('⚡️ ~ file: useTransactor.tsx ~ error');
       return;
     }
 
@@ -60,11 +60,11 @@ export const useTransactor = (_signer?: Signer): TTransactionFunc => {
       } else if (tx != null) {
         transactionResponse = await signer.sendTransaction(tx);
       } else {
-        throw new Error("Incorrect transaction passed to transactor");
+        throw new Error('Incorrect transaction passed to transactor');
       }
       notification.remove(notificationId);
 
-      const blockExplorerTxURL = network ? getBlockExplorerTxLink(network, transactionResponse.hash) : "";
+      const blockExplorerTxURL = network ? getBlockExplorerTxLink(network, transactionResponse.hash) : '';
 
       notificationId = notification.loading(
         <TxnNotification message="Waiting for transaction to complete." blockExplorerLink={blockExplorerTxURL} />,
@@ -75,7 +75,7 @@ export const useTransactor = (_signer?: Signer): TTransactionFunc => {
       notification.success(
         <TxnNotification message="Transaction completed successfully!" blockExplorerLink={blockExplorerTxURL} />,
         {
-          icon: "🎉",
+          icon: '🎉',
         },
       );
 
@@ -89,7 +89,7 @@ export const useTransactor = (_signer?: Signer): TTransactionFunc => {
         notification.remove(notificationId);
       }
       // TODO handle error properly
-      console.error("⚡️ ~ file: useTransactor.ts ~ error", error);
+      console.error('⚡️ ~ file: useTransactor.ts ~ error', error);
       const message = getParsedEthersError(error);
       notification.error(message);
     }

@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
-import { ArrowsRightLeftIcon } from "@heroicons/react/24/outline";
-import { CommonInputProps, InputBase, SIGNED_NUMBER_REGEX } from "~~/components/scaffold-eth";
-import { useAppStore } from "~~/services/store/store";
+import { useMemo, useState } from 'react';
+import { ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
+import { CommonInputProps, InputBase, SIGNED_NUMBER_REGEX } from '~~/components/scaffold-eth';
+import { useAppStore } from '~~/services/store/store';
 
 const MAX_DECIMALS_USD = 2;
 
@@ -65,7 +65,7 @@ export const EtherInput = ({ value, name, placeholder, onChange }: CommonInputPr
     // Following condition is a fix to prevent usdMode from experiencing different display values
     // than what the user entered. This can happen due to floating point rounding errors that are introduced in the back and forth conversion
     if (usdMode) {
-      const decimals = newValue.split(".")[1];
+      const decimals = newValue.split('.')[1];
       if (decimals && decimals.length > MAX_DECIMALS_USD) {
         return;
       }
@@ -73,7 +73,7 @@ export const EtherInput = ({ value, name, placeholder, onChange }: CommonInputPr
 
     // Since the display value is a derived state (calculated from the ether value), usdMode would not allow introducing a decimal point.
     // This condition handles a transitory state for a display value with a trailing decimal sign
-    if (newValue.endsWith(".") || newValue.endsWith(".0")) {
+    if (newValue.endsWith('.') || newValue.endsWith('.0')) {
       setTransitoryDisplayValue(newValue);
     } else {
       setTransitoryDisplayValue(undefined);
@@ -93,13 +93,12 @@ export const EtherInput = ({ value, name, placeholder, onChange }: CommonInputPr
       value={displayValue}
       placeholder={placeholder}
       onChange={handleChangeNumber}
-      prefix={<span className="pl-4 -mr-2 text-primary self-center">{usdMode ? "$" : "Ξ"}</span>}
+      prefix={<span className="pl-4 -mr-2 text-primary self-center">{usdMode ? '$' : 'Ξ'}</span>}
       suffix={
         <button
           className="btn btn-primary h-[2.2rem] min-h-[2.2rem]"
           onClick={toggleMode}
-          disabled={!usdMode && !ethPrice}
-        >
+          disabled={!usdMode && !ethPrice}>
           <ArrowsRightLeftIcon className="h-3 w-3 cursor-pointer" aria-hidden="true" />
         </button>
       }

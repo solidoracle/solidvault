@@ -1,5 +1,5 @@
-import { Dispatch, SetStateAction } from "react";
-import { utils } from "ethers";
+import { Dispatch, SetStateAction } from 'react';
+import { utils } from 'ethers';
 import {
   AddressInput,
   Bytes32Input,
@@ -7,7 +7,7 @@ import {
   InputBase,
   IntegerInput,
   IntegerVariant,
-} from "~~/components/scaffold-eth";
+} from '~~/components/scaffold-eth';
 
 type ContractInputProps = {
   setForm: Dispatch<SetStateAction<Record<string, any>>>;
@@ -29,15 +29,15 @@ export const ContractInput = ({ setForm, form, stateObjectKey, paramType }: Cont
     },
   };
 
-  if (paramType.type === "address") {
+  if (paramType.type === 'address') {
     return <AddressInput {...inputProps} />;
-  } else if (paramType.type === "bytes32") {
+  } else if (paramType.type === 'bytes32') {
     return <Bytes32Input {...inputProps} />;
-  } else if (paramType.type === "bytes") {
+  } else if (paramType.type === 'bytes') {
     return <BytesInput {...inputProps} />;
-  } else if (paramType.type === "string") {
+  } else if (paramType.type === 'string') {
     return <InputBase {...inputProps} />;
-  } else if (paramType.type.includes("int") && !paramType.type.includes("[")) {
+  } else if (paramType.type.includes('int') && !paramType.type.includes('[')) {
     return <IntegerInput {...inputProps} variant={paramType.type as IntegerVariant} />;
   }
 

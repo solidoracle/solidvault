@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
-import type { AppProps } from "next/app";
-import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import "@rainbow-me/rainbowkit/styles.css";
-import NextNProgress from "nextjs-progressbar";
-import { Toaster } from "react-hot-toast";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { WagmiConfig } from "wagmi";
-import { Footer } from "~~/components/Footer";
-import { Header } from "~~/components/Header";
-import { BlockieAvatar } from "~~/components/scaffold-eth";
-import { useEthPrice } from "~~/hooks/scaffold-eth";
-import { useAppStore } from "~~/services/store/store";
-import { wagmiClient } from "~~/services/web3/wagmiClient";
-import { appChains } from "~~/services/web3/wagmiConnectors";
-import "~~/styles/globals.css";
-import theme from "~~/styles/theme";
+import { useEffect, useState } from 'react';
+import type { AppProps } from 'next/app';
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import '@rainbow-me/rainbowkit/styles.css';
+import NextNProgress from 'nextjs-progressbar';
+import { Toaster } from 'react-hot-toast';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { WagmiConfig } from 'wagmi';
+import { Footer } from '~~/components/Footer';
+import { Header } from '~~/components/Header';
+import { BlockieAvatar } from '~~/components/scaffold-eth';
+import { useEthPrice } from '~~/hooks/scaffold-eth';
+import { useAppStore } from '~~/services/store/store';
+import { wagmiClient } from '~~/services/web3/wagmiClient';
+import { appChains } from '~~/services/web3/wagmiConnectors';
+import '~~/styles/globals.css';
+import theme from '~~/styles/theme';
 
 // TODO: make sure FE can deposit and withdraw
 // TODO: post first pass on socials

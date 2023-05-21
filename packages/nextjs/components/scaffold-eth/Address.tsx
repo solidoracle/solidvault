@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import { ethers } from "ethers";
-import { isAddress } from "ethers/lib/utils";
-import Blockies from "react-blockies";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import { useEnsAvatar, useEnsName } from "wagmi";
-import { CheckCircleIcon, DocumentDuplicateIcon } from "@heroicons/react/24/outline";
-import { getBlockExplorerAddressLink, getTargetNetwork } from "~~/utils/scaffold-eth";
+import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
+import { isAddress } from 'ethers/lib/utils';
+import Blockies from 'react-blockies';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { useEnsAvatar, useEnsName } from 'wagmi';
+import { CheckCircleIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
+import { getBlockExplorerAddressLink, getTargetNetwork } from '~~/utils/scaffold-eth';
 
 type TAddressProps = {
   address?: string;
   disableAddressLink?: boolean;
-  format?: "short" | "long";
+  format?: 'short' | 'long';
 };
 
 /**
@@ -21,10 +21,10 @@ export const Address = ({ address, disableAddressLink, format }: TAddressProps) 
   const [ensAvatar, setEnsAvatar] = useState<string | null>();
   const [addressCopied, setAddressCopied] = useState(false);
 
-  const { data: fetchedEns } = useEnsName({ address, enabled: isAddress(address ?? ""), chainId: 1 });
+  const { data: fetchedEns } = useEnsName({ address, enabled: isAddress(address ?? ''), chainId: 1 });
   const { data: fetchedEnsAvatar } = useEnsAvatar({
     address,
-    enabled: isAddress(address ?? ""),
+    enabled: isAddress(address ?? ''),
     chainId: 1,
     cacheTime: 30_000,
   });
@@ -55,11 +55,11 @@ export const Address = ({ address, disableAddressLink, format }: TAddressProps) 
   }
 
   const blockExplorerAddressLink = getBlockExplorerAddressLink(getTargetNetwork(), address);
-  let displayAddress = address?.slice(0, 5) + "..." + address?.slice(-4);
+  let displayAddress = address?.slice(0, 5) + '...' + address?.slice(-4);
 
   if (ens) {
     displayAddress = ens;
-  } else if (format === "long") {
+  } else if (format === 'long') {
     displayAddress = address;
   }
 
@@ -81,8 +81,7 @@ export const Address = ({ address, disableAddressLink, format }: TAddressProps) 
           className="ml-1.5 text-lg font-normal"
           target="_blank"
           href={blockExplorerAddressLink}
-          rel="noopener noreferrer"
-        >
+          rel="noopener noreferrer">
           {displayAddress}
         </a>
       )}
@@ -99,8 +98,7 @@ export const Address = ({ address, disableAddressLink, format }: TAddressProps) 
             setTimeout(() => {
               setAddressCopied(false);
             }, 800);
-          }}
-        >
+          }}>
           <DocumentDuplicateIcon
             className="ml-1.5 text-xl font-normal text-sky-600 h-5 w-5 cursor-pointer"
             aria-hidden="true"

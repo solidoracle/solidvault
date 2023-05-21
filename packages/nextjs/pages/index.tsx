@@ -1,5 +1,5 @@
-import { useState } from "react";
-import Head from "next/head";
+import { useState } from 'react';
+import Head from 'next/head';
 import {
   Alert,
   AlertDescription,
@@ -24,12 +24,12 @@ import {
   TabList,
   TabPanels,
   Tabs,
-} from "@chakra-ui/react";
-import type { NextPage } from "next";
-import { MdSettings } from "react-icons/md";
-import { Deposit } from "~~/components/deposit";
-import { Withdraw } from "~~/components/withdraw";
-import { useGetDataPoolsQuery } from "~~/queries/useGetDataPoolsQuery";
+} from '@chakra-ui/react';
+import type { NextPage } from 'next';
+import { MdSettings } from 'react-icons/md';
+import { Deposit } from '~~/components/deposit';
+import { Withdraw } from '~~/components/withdraw';
+import { useGetDataPoolsQuery } from '~~/queries/useGetDataPoolsQuery';
 
 // TODO: Color variables (/color scheme)
 // TODO: Add a QueryLoader
@@ -41,7 +41,7 @@ const Home: NextPage = () => {
 
   if (isLoading) {
     return (
-      <Box display="flex" alignItems="center" justifyContent="center" sx={{ minHeight: "30vh" }}>
+      <Box display="flex" alignItems="center" justifyContent="center" sx={{ minHeight: '30vh' }}>
         <Spinner size="xl" />
       </Box>
     );
@@ -50,7 +50,7 @@ const Home: NextPage = () => {
   // TODO: Update this to find the pool with the correct address
   if (isError || !poolData?.[0]?.apy) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" sx={{ minHeight: "30vh" }}>
+      <Box display="flex" justifyContent="center" alignItems="center" sx={{ minHeight: '30vh' }}>
         <Alert status="error">
           <AlertIcon />
           <AlertTitle>Unable to connect to Aave</AlertTitle>

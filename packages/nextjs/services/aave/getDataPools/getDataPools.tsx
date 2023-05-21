@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 export interface DataPool {
   address: string;
@@ -18,5 +18,5 @@ export interface DataPool {
 }
 
 export const getDataPools = async (): Promise<DataPool[]> => {
-  return await axios.get("https://aave-api-v2.aave.com/data/pools").then(res => res.data);
+  return await axios.get('https://aave-api-v2.aave.com/data/pools').then(res => res.data);
 };

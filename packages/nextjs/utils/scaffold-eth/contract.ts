@@ -1,8 +1,8 @@
-import { Abi, AbiParametersToPrimitiveTypes, ExtractAbiEvent, ExtractAbiEventNames, ExtractAbiFunction } from "abitype";
-import type { ExtractAbiFunctionNames } from "abitype";
-import { UseContractEventConfig, UseContractReadConfig, UseContractWriteConfig } from "wagmi";
-import contractsData from "~~/generated/deployedContracts";
-import scaffoldConfig from "~~/scaffold.config";
+import { Abi, AbiParametersToPrimitiveTypes, ExtractAbiEvent, ExtractAbiEventNames, ExtractAbiFunction } from 'abitype';
+import type { ExtractAbiFunctionNames } from 'abitype';
+import { UseContractEventConfig, UseContractReadConfig, UseContractWriteConfig } from 'wagmi';
+import contractsData from '~~/generated/deployedContracts';
+import scaffoldConfig from '~~/scaffold.config';
 
 export type GenericContractsDeclaration = {
   [key: number]: readonly {
@@ -24,9 +24,9 @@ type ContractsDeclaration = IsContractsFileMissing<GenericContractsDeclaration, 
 
 export type Chain = keyof ContractsDeclaration;
 
-type SelectedChainId = IsContractsFileMissing<number, (typeof scaffoldConfig)["targetNetwork"]["id"]>;
+type SelectedChainId = IsContractsFileMissing<number, (typeof scaffoldConfig)['targetNetwork']['id']>;
 
-type Contracts = ContractsDeclaration[SelectedChainId][0]["contracts"];
+type Contracts = ContractsDeclaration[SelectedChainId][0]['contracts'];
 
 export type ContractName = keyof Contracts;
 
@@ -39,7 +39,7 @@ export type ContractAbi<TContractName extends ContractName = ContractName> = Inf
 export type AbiFunctionInputs<TAbi extends Abi, TFunctionName extends string> = ExtractAbiFunction<
   TAbi,
   TFunctionName
->["inputs"];
+>['inputs'];
 
 export type AbiFunctionArguments<TAbi extends Abi, TFunctionName extends string> = AbiParametersToPrimitiveTypes<
   AbiFunctionInputs<TAbi, TFunctionName>
@@ -48,7 +48,7 @@ export type AbiFunctionArguments<TAbi extends Abi, TFunctionName extends string>
 export type AbiFunctionOutputs<TAbi extends Abi, TFunctionName extends string> = ExtractAbiFunction<
   TAbi,
   TFunctionName
->["outputs"];
+>['outputs'];
 
 export type AbiFunctionReturnType<TAbi extends Abi, TFunctionName extends string> = IsContractsFileMissing<
   any,
@@ -58,7 +58,7 @@ export type AbiFunctionReturnType<TAbi extends Abi, TFunctionName extends string
 export type AbiEventInputs<TAbi extends Abi, TEventName extends ExtractAbiEventNames<TAbi>> = ExtractAbiEvent<
   TAbi,
   TEventName
->["inputs"];
+>['inputs'];
 
 export type AbiEventArgs<
   TAbi extends Abi,
@@ -66,12 +66,12 @@ export type AbiEventArgs<
 > = AbiParametersToPrimitiveTypes<AbiEventInputs<TAbi, TEventName>>;
 
 export enum ContractCodeStatus {
-  "LOADING",
-  "DEPLOYED",
-  "NOT_FOUND",
+  'LOADING',
+  'DEPLOYED',
+  'NOT_FOUND',
 }
 
-type AbiStateMutability = "pure" | "view" | "nonpayable" | "payable";
+type AbiStateMutability = 'pure' | 'view' | 'nonpayable' | 'payable';
 
 export type FunctionNamesWithoutInputs<
   TAbi extends Abi,
@@ -79,11 +79,11 @@ export type FunctionNamesWithoutInputs<
 > = Extract<
   TAbi[number],
   {
-    type: "function";
+    type: 'function';
     stateMutability: TAbiStateMutibility;
     inputs: readonly [];
   }
->["name"];
+>['name'];
 
 export type FunctionNamesWithInputs<
   TAbi extends Abi,
@@ -92,22 +92,22 @@ export type FunctionNamesWithInputs<
   Extract<
     TAbi[number],
     {
-      type: "function";
+      type: 'function';
       stateMutability: TAbiStateMutibility;
     }
   >,
   {
     inputs: readonly [];
   }
->["name"];
+>['name'];
 
-type ReadAbiStateMutability = "view" | "pure";
-type WriteAbiStateMutability = "nonpayable" | "payable";
+type ReadAbiStateMutability = 'view' | 'pure';
+type WriteAbiStateMutability = 'nonpayable' | 'payable';
 
 type RestConfigParam<TAbiStateMutability extends AbiStateMutability> = Partial<
   Omit<
     TAbiStateMutability extends ReadAbiStateMutability ? UseContractReadConfig : UseContractWriteConfig,
-    "chainId" | "abi" | "address" | "functionName" | "args"
+    'chainId' | 'abi' | 'address' | 'functionName' | 'args'
   >
 >;
 

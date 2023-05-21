@@ -1,13 +1,13 @@
-import { useEffect } from "react";
-import { useEffectOnce, useLocalStorage } from "usehooks-ts";
-import { Connector, useAccount, useConnect } from "wagmi";
-import { hardhat } from "wagmi/chains";
-import scaffoldConfig from "~~/scaffold.config";
-import { burnerWalletId, defaultBurnerChainId } from "~~/services/web3/wagmi-burner/BurnerConnector";
-import { getTargetNetwork } from "~~/utils/scaffold-eth";
-import { contracts } from "~~/utils/scaffold-eth/contract";
+import { useEffect } from 'react';
+import { useEffectOnce, useLocalStorage } from 'usehooks-ts';
+import { Connector, useAccount, useConnect } from 'wagmi';
+import { hardhat } from 'wagmi/chains';
+import scaffoldConfig from '~~/scaffold.config';
+import { burnerWalletId, defaultBurnerChainId } from '~~/services/web3/wagmi-burner/BurnerConnector';
+import { getTargetNetwork } from '~~/utils/scaffold-eth';
+import { contracts } from '~~/utils/scaffold-eth/contract';
 
-const walletIdStorageKey = "scaffoldEth2.wallet";
+const walletIdStorageKey = 'scaffoldEth2.wallet';
 
 /**
  * This function will get the initial wallet connector (if any), the app will connect to
@@ -49,17 +49,17 @@ const getInitialConnector = (
  * Automatically connect to a wallet/connector based on config and prior wallet
  */
 export const useAutoConnect = (): void => {
-  const [walletId, setWalletId] = useLocalStorage<string>(walletIdStorageKey, "");
+  const [walletId, setWalletId] = useLocalStorage<string>(walletIdStorageKey, '');
   const connectState = useConnect();
   const accountState = useAccount();
 
   useEffect(() => {
     if (accountState.isConnected) {
       // user is connected, set walletName
-      setWalletId(accountState.connector?.id ?? "");
+      setWalletId(accountState.connector?.id ?? '');
     } else {
       // user has disconnected, reset walletName
-      setWalletId("");
+      setWalletId('');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountState.isConnected, accountState.connector?.name]);
