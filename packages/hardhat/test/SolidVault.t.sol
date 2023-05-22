@@ -45,8 +45,24 @@ contract SolidVaultTest is Test {
         assertEq(solidVault.aaveRewards(), aaveRewards);
     }
 
-    function testDeposit() public {
 
+    function testETHDeposit() public {
+        weth.approve(address(solidVault), 1 ether);
+        (bool success, ) = address(solidVault).call{value: 1 ether}("");
+
+        assertEq(solidVault.totalHoldings(), 1 ether);      
+        assertEq(solidVault.balanceOf(address(this)), 1 ether); 
+
+        IPool aaveLendingPool = IPool(aaveLendingPoolAddress);
+
+        address aWETHAddress = aaveLendingPool.getReserveData(address(weth)).aTokenAddress;
+        IERC20 aWETH = IERC20(aWETHAddress);
+        assertEq(aWETH.balanceOf(address(solidVault)), 1 ether);
+
+    }
+
+
+    function testWETHDeposit() private {
         // wrap ETH
         weth.deposit{value: 1 ether}();
         uint256 initialWethBalance = weth.balanceOf(address(this));
@@ -78,7 +94,7 @@ contract SolidVaultTest is Test {
         assertEq(aWETH.balanceOf(address(solidVault)), 1 ether);
     }        
 
-    function testWithdraw() public {
+    function testWithdraw() private {
         weth.deposit{value: 1 ether}();
         // approve
         weth.approve(address(solidVault), 1 ether);
