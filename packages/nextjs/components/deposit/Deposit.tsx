@@ -1,5 +1,11 @@
-import { useState } from "react";
+import { useState } from 'react';
+import { useDeposit } from '../../hooks/other/useDeposit';
+import { useSovBalance } from '../../hooks/other/useSovBalance';
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Box,
   Button,
   Divider,
@@ -13,61 +19,37 @@ import {
   Select,
   TabPanel,
   Text,
-} from "@chakra-ui/react";
-import { ethers } from "ethers";
-import { useAccount } from "wagmi";
-import useApprove from "~~/hooks/other/useApprove";
-import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
-import { DataPool } from "~~/services/aave/getDataPools";
+} from '@chakra-ui/react';
+import { ethers } from 'ethers';
+import { useNetwork } from 'wagmi';
+import useApprove from '~~/hooks/other/useApprove';
+import { DataPool } from '~~/services/aave/getDataPools';
 
+export type CurrencyCode = 'ETH' | 'WETH';
 interface DepositProps {
-  apy: DataPool["apy"];
+  apy: DataPool['apy'];
 }
 
 export const Deposit = ({ apy }: DepositProps) => {
-  const { address } = useAccount();
-  const [depositValue, setDepositValue] = useState(0);
-  const { wethApprove, allowance } = useApprove();
-  const [isDepositing, setIsDepositing] = useState(false);
-
-  const { writeAsync: deposit } = useScaffoldContractWrite({
-    contractName: "SolidVault",
-    functionName: "deposit",
-    args: [
-      depositValue.toString() == "" ? ethers.utils.parseEther("0") : ethers.utils.parseEther(depositValue.toString()),
-      address,
-    ],
-  });
-
-  const { data: sovBalance } = useScaffoldContractRead({
-    contractName: "SolidVault",
-    functionName: "balanceOf",
-    args: [address],
-  });
-
-  const handleDeposit = async () => {
-    setIsDepositing(true);
-
-    if (Number(ethers.utils.formatEther(allowance)) < Number(depositValue)) {
-      wethApprove?.();
-      return deposit?.();
-      setIsDepositing(false);
-    } else {
-      return deposit?.();
-      setIsDepositing(false);
-    }
-  };
+  const { wethApprove, allowance, isLoading: isApproveLoading } = useApprove();
+  const { handleDeposit, isLoading, isError, depositValue, setDepositValue } = useDeposit();
+  const { sovBalance } = useSovBalance();
+  const [currencyCode, setCurrencyCode] = useState<CurrencyCode>('ETH');
+  const noAllowanceSet = Number(ethers.utils.formatEther(allowance)) === 0;
+  const allowanceToLow = Number(depositValue) > Number(ethers.utils.formatEther(allowance));
+  const isWeth = currencyCode === 'WETH';
 
   return (
     <TabPanel px={0} pt={6}>
+      {isError && <Error />}
       <form>
-        <Grid gridTemplateColumns={"1.4fr 1fr"} gap={4} mb={5}>
+        <Grid gridTemplateColumns={'1.4fr 1fr'} gap={4} mb={5}>
           <GridItem>
             <NumberInput
-              onChange={(stringVal, numberVal) => {
+              min={0}
+              onChange={(_stringVal, numberVal) => {
                 setDepositValue(numberVal);
-              }}
-            >
+              }}>
               <NumberInputField />
               <NumberInputStepper>
                 <NumberIncrementStepper />
@@ -76,9 +58,9 @@ export const Deposit = ({ apy }: DepositProps) => {
             </NumberInput>
           </GridItem>
           <GridItem>
-            <Select>
-              <option value="option1">ETH</option>
-              <option value="option2">WETH</option>
+            <Select onChange={e => setCurrencyCode(e.target.value as CurrencyCode)}>
+              <option value="ETH">ETH</option>
+              <option value="WETH">WETH</option>
             </Select>
           </GridItem>
         </Grid>
@@ -87,13 +69,15 @@ export const Deposit = ({ apy }: DepositProps) => {
           <Box>
             <Box display="flex">
               <Text fontSize="xl" marginRight={2} marginBottom={0} fontWeight="medium">
-                {sovBalance ? ethers.utils.formatEther(sovBalance) : "0.000"}
+                {/* TODO: This should be the amount of SOV you will receive based on the depositValue */}
+                {sovBalance}
               </Text>
               <Text fontSize="xl" marginBottom={0} fontWeight="medium">
                 SOV
               </Text>
             </Box>
             <Box display="flex">
+              {/* TODO: Do we need the minimum amount? */}
               <Text fontSize="md" marginRight={2} marginTop={0} fontWeight="medium" color="gray.400">
                 Minimum:
               </Text>
@@ -108,10 +92,33 @@ export const Deposit = ({ apy }: DepositProps) => {
             </Text>
           </Box>
         </Box>
-        <Button colorScheme="purple" width="100%" onClick={handleDeposit} isLoading={isDepositing}>
-          Deposit
-        </Button>
+        {(isWeth && noAllowanceSet) || (isWeth && allowanceToLow) ? (
+          <Button colorScheme="green" mb="2" width="100%" onClick={wethApprove}>
+            Approve
+          </Button>
+        ) : (
+          <Button
+            colorScheme="purple"
+            width="100%"
+            onClick={() => handleDeposit({ currencyCode })}
+            isDisabled={depositValue <= 0 || isError}
+            isLoading={isLoading}>
+            Deposit
+          </Button>
+        )}
       </form>
     </TabPanel>
+  );
+};
+
+const Error = () => {
+  return (
+    <Box mb="6">
+      <Alert status="error">
+        <AlertIcon />
+        <AlertTitle>Unable to allow deposits</AlertTitle>
+        <AlertDescription>Please try again later.</AlertDescription>
+      </Alert>
+    </Box>
   );
 };

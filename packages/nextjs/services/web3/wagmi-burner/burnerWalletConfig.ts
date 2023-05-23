@@ -1,13 +1,13 @@
-import { Chain, Wallet } from "@rainbow-me/rainbowkit";
-import { hardhat } from "wagmi/chains";
-import scaffoldConfig from "~~/scaffold.config";
+import { Chain, Wallet } from '@rainbow-me/rainbowkit';
+import { hardhat } from 'wagmi/chains';
+import scaffoldConfig from '~~/scaffold.config';
 import {
   BurnerConnector,
   burnerWalletId,
   burnerWalletName,
   defaultBurnerChainId,
-} from "~~/services/web3/wagmi-burner/BurnerConnector";
-import { getTargetNetwork } from "~~/utils/scaffold-eth";
+} from '~~/services/web3/wagmi-burner/BurnerConnector';
+import { getTargetNetwork } from '~~/utils/scaffold-eth';
 
 const burnerConfig = scaffoldConfig.burnerWallet;
 const targetNetwork = getTargetNetwork();
@@ -23,8 +23,8 @@ export interface BurnerWalletOptions {
 export const burnerWalletConfig = ({ chains }: BurnerWalletOptions): Wallet => ({
   id: burnerWalletId,
   name: burnerWalletName,
-  iconUrl: "https://avatars.githubusercontent.com/u/56928858?s=200&v=4",
-  iconBackground: "#0c2f78",
+  iconUrl: 'https://avatars.githubusercontent.com/u/56928858?s=200&v=4',
+  iconBackground: '#0c2f78',
   hidden: () => {
     if (!burnerConfig.enabled) {
       return true;

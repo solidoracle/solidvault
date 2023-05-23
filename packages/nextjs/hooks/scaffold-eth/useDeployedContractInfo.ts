@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { useIsMounted } from "usehooks-ts";
-import { useProvider } from "wagmi";
-import scaffoldConfig from "~~/scaffold.config";
-import { Contract, ContractCodeStatus, ContractName, contracts } from "~~/utils/scaffold-eth/contract";
+import { useEffect, useState } from 'react';
+import { useIsMounted } from 'usehooks-ts';
+import { useProvider } from 'wagmi';
+import scaffoldConfig from '~~/scaffold.config';
+import { Contract, ContractCodeStatus, ContractName, contracts } from '~~/utils/scaffold-eth/contract';
 
 /**
  * Gets a deployed contract from `yarn deploy` generated files.
@@ -28,7 +28,7 @@ export const useDeployedContractInfo = <TContractName extends ContractName>(cont
         return;
       }
       // If contract code is `0x` => no contract deployed on that address
-      if (code === "0x") {
+      if (code === '0x') {
         setStatus(ContractCodeStatus.NOT_FOUND);
         return;
       }

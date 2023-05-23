@@ -1,1 +1,1 @@
-export const isENS = (address = "") => address.endsWith(".eth") || address.endsWith(".xyz");
+export const isENS = (address = '') => address.endsWith('.eth') || address.endsWith('.xyz');

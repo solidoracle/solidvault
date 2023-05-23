@@ -1,1 +1,1 @@
-export { useGetDataPoolsQuery } from "./useGetDataPoolsQuery";
+export { useGetDataPoolsQuery } from './useGetDataPoolsQuery';

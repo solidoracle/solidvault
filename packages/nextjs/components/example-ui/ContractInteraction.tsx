@@ -1,19 +1,19 @@
-import { useState } from "react";
-import { CopyIcon } from "./assets/CopyIcon";
-import { DiamondIcon } from "./assets/DiamondIcon";
-import { HareIcon } from "./assets/HareIcon";
-import { ArrowSmallRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useState } from 'react';
+import { CopyIcon } from './assets/CopyIcon';
+import { DiamondIcon } from './assets/DiamondIcon';
+import { HareIcon } from './assets/HareIcon';
+import { ArrowSmallRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useScaffoldContractWrite } from '~~/hooks/scaffold-eth';
 
 export const ContractInteraction = () => {
   const [visible, setVisible] = useState(true);
-  const [newGreeting, setNewGreeting] = useState("");
+  const [newGreeting, setNewGreeting] = useState('');
 
   const { writeAsync, isLoading } = useScaffoldContractWrite({
-    contractName: "YourContract",
-    functionName: "setGreeting",
+    contractName: 'YourContract',
+    functionName: 'setGreeting',
     args: [newGreeting],
-    value: "0.01",
+    value: '0.01',
   });
 
   return (
@@ -22,7 +22,7 @@ export const ContractInteraction = () => {
       <CopyIcon className="absolute bottom-0 left-36" />
       <HareIcon className="absolute right-0 bottom-24" />
       <div className="flex flex-col w-full mx-5 sm:mx-8 2xl:mx-20">
-        <div className={`mt-10 flex gap-2 ${visible ? "" : "invisible"} max-w-2xl`}>
+        <div className={`mt-10 flex gap-2 ${visible ? '' : 'invisible'} max-w-2xl`}>
           <div className="flex gap-5 bg-base-200 bg-opacity-80 z-0 p-7 rounded-2xl shadow-lg">
             <span className="text-3xl">👋🏻</span>
             <div>
@@ -31,18 +31,17 @@ export const ContractInteraction = () => {
                 them to life with your own design! Have fun and try it out!
               </div>
               <div className="mt-2">
-                Check out{" "}
+                Check out{' '}
                 <code className="italic bg-base-300 text-base font-bold [word-spacing:-0.5rem]">
                   packages / nextjs/pages / example-ui.tsx
-                </code>{" "}
+                </code>{' '}
                 and its underlying components.
               </div>
             </div>
           </div>
           <button
             className="btn btn-circle btn-ghost h-6 w-6 bg-base-200 bg-opacity-80 z-0 min-h-0 drop-shadow-md"
-            onClick={() => setVisible(false)}
-          >
+            onClick={() => setVisible(false)}>
             <XMarkIcon className="h-4 w-4" />
           </button>
         </div>
@@ -61,10 +60,9 @@ export const ContractInteraction = () => {
               <div className="flex rounded-full border-2 border-primary p-1">
                 <button
                   className={`btn btn-primary rounded-full capitalize font-normal font-white w-24 flex items-center gap-1 hover:gap-2 transition-all tracking-widest ${
-                    isLoading ? "loading" : ""
+                    isLoading ? 'loading' : ''
                   }`}
-                  onClick={writeAsync}
-                >
+                  onClick={writeAsync}>
                   {!isLoading && (
                     <>
                       Send <ArrowSmallRightIcon className="w-3 h-3 mt-0.5" />

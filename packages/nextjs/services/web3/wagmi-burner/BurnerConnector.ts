@@ -1,13 +1,13 @@
-import { StaticJsonRpcProvider } from "@ethersproject/providers";
-import { Wallet } from "ethers";
-import { Chain, Connector } from "wagmi";
-import { loadBurnerSK } from "~~/hooks/scaffold-eth";
-import { BurnerConnectorError, BurnerConnectorErrorList } from "~~/services/web3/wagmi-burner/BurnerConnectorErrors";
-import { BurnerConnectorData, BurnerConnectorOptions } from "~~/services/web3/wagmi-burner/BurnerConnectorTypes";
-import { getTargetNetwork } from "~~/utils/scaffold-eth";
+import { StaticJsonRpcProvider } from '@ethersproject/providers';
+import { Wallet } from 'ethers';
+import { Chain, Connector } from 'wagmi';
+import { loadBurnerSK } from '~~/hooks/scaffold-eth';
+import { BurnerConnectorError, BurnerConnectorErrorList } from '~~/services/web3/wagmi-burner/BurnerConnectorErrors';
+import { BurnerConnectorData, BurnerConnectorOptions } from '~~/services/web3/wagmi-burner/BurnerConnectorTypes';
+import { getTargetNetwork } from '~~/utils/scaffold-eth';
 
-export const burnerWalletId = "burner-wallet";
-export const burnerWalletName = "Burner Wallet";
+export const burnerWalletId = 'burner-wallet';
+export const burnerWalletName = 'Burner Wallet';
 export const defaultBurnerChainId = getTargetNetwork().id;
 
 /**
@@ -72,7 +72,7 @@ export class BurnerConnector extends Connector<StaticJsonRpcProvider, BurnerConn
   }
 
   disconnect(): Promise<void> {
-    console.log("disconnect from burnerwallet");
+    console.log('disconnect from burnerwallet');
     return Promise.resolve();
   }
 

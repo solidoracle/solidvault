@@ -1,1 +1,1 @@
-export { tabsTheme } from "./Theme";
+export { tabsTheme } from './Theme';

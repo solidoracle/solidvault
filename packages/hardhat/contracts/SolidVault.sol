@@ -180,7 +180,13 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
     //////////////////////////////////////////////////////////////*/
 
     /// @dev Required for the Vault to receive unwrapped ETH.
-    receive() external payable {}
+    receive() external payable {
+        // Convert the ETH to WETH
+        WETH(payable(address(asset))).deposit{value: msg.value}();
+
+        // Deposit the WETH to the Vault
+        this.deposit(msg.value, msg.sender);
+     }
 
 }
 

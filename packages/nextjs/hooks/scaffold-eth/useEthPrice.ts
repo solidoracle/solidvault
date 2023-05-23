@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { useInterval } from "usehooks-ts";
-import { useProvider } from "wagmi";
-import scaffoldConfig from "~~/scaffold.config";
-import { fetchPriceFromUniswap } from "~~/utils/scaffold-eth";
+import { useEffect, useState } from 'react';
+import { useInterval } from 'usehooks-ts';
+import { useProvider } from 'wagmi';
+import scaffoldConfig from '~~/scaffold.config';
+import { fetchPriceFromUniswap } from '~~/utils/scaffold-eth';
 
 const enablePolling = false;
 

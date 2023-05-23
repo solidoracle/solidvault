@@ -1,6 +1,6 @@
-import { TransactionReceipt } from "@ethersproject/abstract-provider";
-import { BigNumber } from "ethers";
-import { displayTxResult } from "~~/components/scaffold-eth";
+import { TransactionReceipt } from '@ethersproject/abstract-provider';
+import { BigNumber } from 'ethers';
+import { displayTxResult } from '~~/components/scaffold-eth';
 
 export const TxReceipt = (
   txResult: string | number | BigNumber | Record<string, any> | TransactionReceipt | undefined,

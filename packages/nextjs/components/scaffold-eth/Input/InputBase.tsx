@@ -1,5 +1,5 @@
-import { ChangeEvent, ReactNode, useCallback } from "react";
-import { CommonInputProps } from "~~/components/scaffold-eth";
+import { ChangeEvent, ReactNode, useCallback } from 'react';
+import { CommonInputProps } from '~~/components/scaffold-eth';
 
 type InputBaseProps<T> = CommonInputProps<T> & {
   error?: boolean;
@@ -18,11 +18,11 @@ export const InputBase = <T extends { toString: () => string } = string>({
   prefix,
   suffix,
 }: InputBaseProps<T>) => {
-  let modifier = "";
+  let modifier = '';
   if (error) {
-    modifier = "border-error";
+    modifier = 'border-error';
   } else if (disabled) {
-    modifier = "border-disabled bg-base-300";
+    modifier = 'border-disabled bg-base-300';
   }
 
   const handleChange = useCallback(

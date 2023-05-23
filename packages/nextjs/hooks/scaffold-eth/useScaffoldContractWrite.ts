@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Abi, ExtractAbiFunctionNames } from "abitype";
-import { utils } from "ethers";
-import { useContractWrite, useNetwork } from "wagmi";
-import { getParsedEthersError } from "~~/components/scaffold-eth";
-import { useDeployedContractInfo, useTransactor } from "~~/hooks/scaffold-eth";
-import { getTargetNetwork, notification } from "~~/utils/scaffold-eth";
-import { ContractAbi, ContractName, UseScaffoldWriteConfig } from "~~/utils/scaffold-eth/contract";
+import { useState } from 'react';
+import { Abi, ExtractAbiFunctionNames } from 'abitype';
+import { utils } from 'ethers';
+import { useContractWrite, useNetwork } from 'wagmi';
+import { getParsedEthersError } from '~~/components/scaffold-eth';
+import { useDeployedContractInfo, useTransactor } from '~~/hooks/scaffold-eth';
+import { getTargetNetwork, notification } from '~~/utils/scaffold-eth';
+import { ContractAbi, ContractName, UseScaffoldWriteConfig } from '~~/utils/scaffold-eth/contract';
 
 /**
  * @dev wrapper for wagmi's useContractWrite hook(with config prepared by usePrepareContractWrite hook) which loads in deployed contract abi and address automatically
@@ -17,7 +17,7 @@ import { ContractAbi, ContractName, UseScaffoldWriteConfig } from "~~/utils/scaf
  */
 export const useScaffoldContractWrite = <
   TContractName extends ContractName,
-  TFunctionName extends ExtractAbiFunctionNames<ContractAbi<TContractName>, "nonpayable" | "payable">,
+  TFunctionName extends ExtractAbiFunctionNames<ContractAbi<TContractName>, 'nonpayable' | 'payable'>,
 >({
   contractName,
   functionName,
@@ -32,7 +32,7 @@ export const useScaffoldContractWrite = <
   const configuredNetwork = getTargetNetwork();
 
   const wagmiContractWrite = useContractWrite({
-    mode: "recklesslyUnprepared",
+    mode: 'recklesslyUnprepared',
     chainId: configuredNetwork.id,
     address: deployedContractData?.address,
     abi: deployedContractData?.abi as Abi,
@@ -46,15 +46,15 @@ export const useScaffoldContractWrite = <
 
   const sendContractWriteTx = async () => {
     if (!deployedContractData) {
-      notification.error("Target Contract is not deployed, did you forgot to run `yarn deploy`?");
+      notification.error('Target Contract is not deployed, did you forgot to run `yarn deploy`?');
       return;
     }
     if (!chain?.id) {
-      notification.error("Please connect your wallet");
+      notification.error('Please connect your wallet');
       return;
     }
     if (chain?.id !== configuredNetwork.id) {
-      notification.error("You on the wrong network");
+      notification.error('You on the wrong network');
       return;
     }
 
@@ -69,7 +69,7 @@ export const useScaffoldContractWrite = <
         setIsMining(false);
       }
     } else {
-      notification.error("Contract writer error. Try again.");
+      notification.error('Contract writer error. Try again.');
       return;
     }
   };

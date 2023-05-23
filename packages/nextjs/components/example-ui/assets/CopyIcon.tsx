@@ -6,8 +6,7 @@ export const CopyIcon = ({ className }: { className: string }) => {
       height="117"
       viewBox="0 0 125 117"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+      xmlns="http://www.w3.org/2000/svg">
       <path d="M124.054 21.9365H116.774V145.99H124.054V21.9365Z" fill="#B5B5B5" />
       <path d="M116.774 14.6089H109.446V21.9372H116.774V14.6089Z" fill="#B5B5B5" />
       <path d="M109.446 7.3291H102.165V14.6095H109.446V7.3291Z" fill="#B5B5B5" />
