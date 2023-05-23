@@ -120,6 +120,8 @@ contract SolidVaultTest is Test {
         uint assets = solidVault.convertToAssets(shares);
         solidVault.withdraw(assets, address(0x04), address(this)); // we are sending the withdrawn weth to address(0x04)
         assertEq(weth.balanceOf(address(0x04)), 1 ether);
+        assertEq(solidVault.totalHoldings(), 0);
+
     }
 
     function testWithdrawFuzz(uint amount) private {
@@ -139,7 +141,52 @@ contract SolidVaultTest is Test {
         uint assets = solidVault.convertToAssets(shares);
         solidVault.withdraw(assets, address(0x04), address(this)); // we are sending the withdrawn weth to address(0x04)
         assertEq(weth.balanceOf(address(0x04)), amount);
+        assertEq(solidVault.totalHoldings(), 0);
     }
+
+    function testMultipleUsers(address[] memory users) private {
+        uint totalDeposit = 0;
+    
+        for (uint i = 0; i < users.length; i++) {
+            address user = users[i];
+            uint randomAmount = bound((uint(keccak256(abi.encodePacked(user, block.timestamp))) % 1 ether), 0, address(this).balance);
+            
+            // Send Ether to the user
+            (bool success,) = user.call{value: randomAmount}("");
+            require(success, "Transfer failed");
+    
+            // Each user wraps ETH and approves SolidVault
+            WETHInterface(weth).deposit{value: randomAmount}();
+            weth.approve(address(solidVault), randomAmount);
+    
+            // Each user deposits on Aave
+            solidVault.deposit(randomAmount, user);
+
+            totalDeposit += randomAmount;
+        }
+    
+        // Confirm total deposits
+        assertEq(solidVault.totalHoldings(), totalDeposit);
+    
+        for (uint i = 0; i < users.length; i++) {
+            address user = users[i];
+    
+            // Each user withdraws
+            uint shares = solidVault.balanceOf(user);
+            uint assets = solidVault.convertToAssets(shares);
+            solidVault.withdraw(assets, user, user);
+    
+            // Confirm each user's balance
+            assertEq(weth.balanceOf(user), assets);
+        }
+    
+        // Confirm total withdrawals
+        assertEq(solidVault.totalHoldings(), 0);
+    }
+    
+
+
+
 
 
     
