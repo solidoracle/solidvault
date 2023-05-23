@@ -58,9 +58,20 @@ contract SolidVaultTest is Test {
         address aWETHAddress = aaveLendingPool.getReserveData(address(weth)).aTokenAddress;
         IERC20 aWETH = IERC20(aWETHAddress);
         assertEq(aWETH.balanceOf(address(solidVault)), 1 ether);
-
     }
 
+    function testETHDepositFuzz(uint amount) public {
+        amount = bound(amount, 0, address(this).balance);
+
+        weth.approve(address(solidVault), amount);
+
+        (bool success, ) = address(solidVault).call{value: amount}("");
+
+        assertEq(solidVault.totalHoldings(), amount);      
+        assertEq(solidVault.balanceOf(address(this)), amount); 
+
+        IPool aaveLendingPool = IPool(aaveLendingPoolAddress);
+    }
 
     function testWETHDeposit() private {
         // wrap ETH
@@ -109,6 +120,25 @@ contract SolidVaultTest is Test {
         uint assets = solidVault.convertToAssets(shares);
         solidVault.withdraw(assets, address(0x04), address(this)); // we are sending the withdrawn weth to address(0x04)
         assertEq(weth.balanceOf(address(0x04)), 1 ether);
+    }
+
+    function testWithdrawFuzz(uint amount) private {
+        amount = bound(amount, 0, address(this).balance);
+
+        weth.deposit{value: amount}();
+        // approve
+        weth.approve(address(solidVault), amount);
+        // we MUST approve solidVault or other address to spend our vault tokens in case they are the ones calling withdraw
+        solidVault.approve( address(solidVault), amount);
+
+        // deposit on aave
+        solidVault.deposit(amount, address(this));
+
+        // withdraw
+        uint shares = solidVault.balanceOf(address(this));
+        uint assets = solidVault.convertToAssets(shares);
+        solidVault.withdraw(assets, address(0x04), address(this)); // we are sending the withdrawn weth to address(0x04)
+        assertEq(weth.balanceOf(address(0x04)), amount);
     }
 
 
