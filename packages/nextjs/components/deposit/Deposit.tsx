@@ -21,7 +21,6 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
-import { useNetwork } from 'wagmi';
 import useApprove from '~~/hooks/other/useApprove';
 import { DataPool } from '~~/services/aave/getDataPools';
 
@@ -31,9 +30,8 @@ interface DepositProps {
 }
 
 export const Deposit = ({ apy }: DepositProps) => {
-  const { wethApprove, allowance, isLoading: isApproveLoading } = useApprove();
+  const { wethApprove, allowance } = useApprove();
   const { handleDeposit, isLoading, isError, depositValue, setDepositValue } = useDeposit();
-  const { sovBalance } = useSovBalance();
   const [currencyCode, setCurrencyCode] = useState<CurrencyCode>('ETH');
   const noAllowanceSet = Number(ethers.utils.formatEther(allowance)) === 0;
   const allowanceToLow = Number(depositValue) > Number(ethers.utils.formatEther(allowance));
@@ -65,32 +63,10 @@ export const Deposit = ({ apy }: DepositProps) => {
           </GridItem>
         </Grid>
         <Divider orientation="horizontal" />
-        <Box display="flex" justifyContent="space-between">
-          <Box>
-            <Box display="flex">
-              <Text fontSize="xl" marginRight={2} marginBottom={0} fontWeight="medium">
-                {/* TODO: This should be the amount of SOV you will receive based on the depositValue */}
-                {sovBalance}
-              </Text>
-              <Text fontSize="xl" marginBottom={0} fontWeight="medium">
-                SOV
-              </Text>
-            </Box>
-            <Box display="flex">
-              {/* TODO: Do we need the minimum amount? */}
-              <Text fontSize="md" marginRight={2} marginTop={0} fontWeight="medium" color="gray.400">
-                Minimum:
-              </Text>
-              <Text fontSize="md" marginTop={0} fontWeight="medium" color="gray.400">
-                0.000000
-              </Text>
-            </Box>
-          </Box>
-          <Box alignSelf="end">
-            <Text fontSize="md" fontWeight="medium" color="gray.400">
-              {apy}% APY
-            </Text>
-          </Box>
+        <Box>
+          <Text fontSize="md" fontWeight="medium" color="gray.400">
+            {apy}% APY
+          </Text>
         </Box>
         {(isWeth && noAllowanceSet) || (isWeth && allowanceToLow) ? (
           <Button colorScheme="green" mb="2" width="100%" onClick={wethApprove}>

@@ -15,22 +15,6 @@ export const Withdraw = () => {
           </GridItem>
         </Grid>
         <Divider orientation="horizontal" />
-        <Box display="flex">
-          <Text fontSize="xl" marginRight={2} marginBottom={0} fontWeight="medium">
-            0.000000
-          </Text>
-          <Text fontSize="xl" marginBottom={0} fontWeight="medium">
-            WMATIC
-          </Text>
-        </Box>
-        <Box display="flex">
-          <Text fontSize="md" marginRight={2} marginTop={0} fontWeight="medium" color="gray.400">
-            Minimum:
-          </Text>
-          <Text fontSize="md" marginTop={0} fontWeight="medium" color="gray.400">
-            0.000000
-          </Text>
-        </Box>
         <Button colorScheme="purple" width="100%">
           Withdraw
         </Button>
