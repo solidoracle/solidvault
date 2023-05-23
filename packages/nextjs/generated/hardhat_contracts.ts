@@ -5,7 +5,7 @@ export default {
       chainId: "5",
       contracts: {
         SolidVault: {
-          address: "0x856Bb4Bd82FD1e3fAca15c7d11866adE8861532B",
+          address: "0x63A837fF7a06f1b753E925C0fb3F211a09E462A7",
           abi: [
             {
               inputs: [

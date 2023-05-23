@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useDeposit } from '../../hooks/other/useDeposit';
 import { useSovBalance } from '../../hooks/other/useSovBalance';
 import {
@@ -24,18 +25,19 @@ import { useNetwork } from 'wagmi';
 import useApprove from '~~/hooks/other/useApprove';
 import { DataPool } from '~~/services/aave/getDataPools';
 
+export type CurrencyCode = 'ETH' | 'WETH';
 interface DepositProps {
   apy: DataPool['apy'];
 }
-// Allowance = allowed amount to spend
-// Check if deposit value < allowance amount
-// If invalid allowance amount disable the button
 
 export const Deposit = ({ apy }: DepositProps) => {
-  // TODO: Is it possible to track approves? Can we show a loading spinner whilst it's happening? Can we rerender so the approve button is removed?
-  const { wethApprove, allowance } = useApprove();
+  const { wethApprove, allowance, isLoading: isApproveLoading } = useApprove();
   const { handleDeposit, isLoading, isError, depositValue, setDepositValue } = useDeposit();
   const { sovBalance } = useSovBalance();
+  const [currencyCode, setCurrencyCode] = useState<CurrencyCode>('ETH');
+  const noAllowanceSet = Number(ethers.utils.formatEther(allowance)) === 0;
+  const allowanceToLow = Number(depositValue) > Number(ethers.utils.formatEther(allowance));
+  const isWeth = currencyCode === 'WETH';
 
   return (
     <TabPanel px={0} pt={6}>
@@ -56,9 +58,9 @@ export const Deposit = ({ apy }: DepositProps) => {
             </NumberInput>
           </GridItem>
           <GridItem>
-            <Select>
-              <option value="option1">ETH</option>
-              <option value="option2">WETH</option>
+            <Select onChange={e => setCurrencyCode(e.target.value as CurrencyCode)}>
+              <option value="ETH">ETH</option>
+              <option value="WETH">WETH</option>
             </Select>
           </GridItem>
         </Grid>
@@ -90,20 +92,20 @@ export const Deposit = ({ apy }: DepositProps) => {
             </Text>
           </Box>
         </Box>
-        {Number(ethers.utils.formatEther(allowance)) === 0 ||
-        Number(depositValue) > Number(ethers.utils.formatEther(allowance)) ? (
+        {(isWeth && noAllowanceSet) || (isWeth && allowanceToLow) ? (
           <Button colorScheme="green" mb="2" width="100%" onClick={wethApprove}>
             Approve
           </Button>
-        ) : null}
-        <Button
-          colorScheme="purple"
-          width="100%"
-          onClick={handleDeposit}
-          isDisabled={depositValue <= 0 || isError || Number(ethers.utils.formatEther(allowance)) === 0}
-          isLoading={isLoading}>
-          Deposit
-        </Button>
+        ) : (
+          <Button
+            colorScheme="purple"
+            width="100%"
+            onClick={() => handleDeposit({ currencyCode })}
+            isDisabled={depositValue <= 0 || isError}
+            isLoading={isLoading}>
+            Deposit
+          </Button>
+        )}
       </form>
     </TabPanel>
   );

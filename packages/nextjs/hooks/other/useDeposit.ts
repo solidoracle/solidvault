@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { CurrencyCode } from '../../components/deposit';
 import { useScaffoldContractWrite } from '../scaffold-eth';
 import { ethers } from 'ethers';
 import { useAccount } from 'wagmi';
@@ -11,20 +12,19 @@ export const useDeposit = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const handleDepositValue = () => {
-    if (!depositValue || depositValue === 0) {
-      return ethers.utils.parseEther('0');
-    }
-    return ethers.utils.parseEther(depositValue.toString());
-  };
-
   const { writeAsync: deposit } = useScaffoldContractWrite({
     contractName: 'SolidVault',
     functionName: 'deposit',
-    args: [handleDepositValue(), address],
+    args: [parseEther(depositValue), address],
   });
 
-  const handleDeposit = () => {
+  const { writeAsync: receive } = useScaffoldContractWrite({
+    contractName: 'SolidVault',
+    functionName: 'receive',
+    args: [parseEther(depositValue), address],
+  });
+
+  const handleDeposit = ({ currencyCode }: CurrencyCode) => {
     setIsLoading(true);
 
     if (!wethApprove) {
@@ -33,13 +33,23 @@ export const useDeposit = () => {
       return;
     }
 
-    // TODO: Add error here if allowance < depositValue
-    if (Number(ethers.utils.formatEther(allowance)) > Number(depositValue)) {
+    if (currencyCode === 'WETH') {
       deposit();
       setIsLoading(false);
       return;
     }
+
+    receive();
+    setIsLoading(false);
+    return;
   };
 
   return { handleDeposit, isLoading, isError, depositValue, setDepositValue };
+};
+
+const parseEther = (value: number) => {
+  if (!value || value === 0) {
+    return ethers.utils.parseEther('0');
+  }
+  return ethers.utils.parseEther(value.toString());
 };

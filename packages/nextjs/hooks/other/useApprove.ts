@@ -26,9 +26,9 @@ export default function useApprove() {
     args: [SOLIDVAULT_CONTRACT_ADDRESS, ethers.utils.parseEther('100')],
   });
 
-  const { write: wethApprove } = useContractWrite({
+  const { write: wethApprove, isLoading } = useContractWrite({
     ...wethApproveConfig,
   });
 
-  return { allowance, wethApprove };
+  return { allowance, wethApprove, isLoading };
 }
