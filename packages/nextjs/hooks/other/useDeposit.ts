@@ -28,7 +28,7 @@ export const useDeposit = () => {
     setIsLoading(true);
 
     if (allowance.lt(parseEther(depositValue))) {
-      await approve(depositValue);
+      approve(depositValue);
       if (currencyCode === 'WETH') {
         deposit();
         setIsLoading(false);
