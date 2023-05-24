@@ -92,20 +92,14 @@ export const Deposit = ({ apy }: DepositProps) => {
             </Text>
           </Box>
         </Box>
-        {(isWeth && noAllowanceSet) || (isWeth && allowanceToLow) ? (
-          <Button colorScheme="green" mb="2" width="100%" onClick={wethApprove}>
-            Approve
-          </Button>
-        ) : (
-          <Button
-            colorScheme="purple"
-            width="100%"
-            onClick={() => handleDeposit({ currencyCode })}
-            isDisabled={depositValue <= 0 || isError}
-            isLoading={isLoading}>
-            Deposit
-          </Button>
-        )}
+        <Button
+          colorScheme="purple"
+          width="100%"
+          onClick={() => handleDeposit({ currencyCode })}
+          isDisabled={depositValue <= 0 || isError}
+          isLoading={isLoading}>
+          Deposit
+        </Button>
       </form>
     </TabPanel>
   );

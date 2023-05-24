@@ -8,7 +8,7 @@ import useApprove from '~~/hooks/other/useApprove';
 
 export const useDeposit = () => {
   const { address } = useAccount();
-  const { wethApprove, allowance } = useApprove();
+  const { approve, allowance } = useApprove();
   const [depositValue, setDepositValue] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -27,10 +27,15 @@ export const useDeposit = () => {
   const handleDeposit = ({ currencyCode }: CurrencyCode) => {
     setIsLoading(true);
 
-    if (!wethApprove) {
-      // TODO: Make error a string value not boolean so different errors can be returned
-      setIsError(true);
-      return;
+    if (allowance.lt(parseEther(depositValue))) {
+      await approve(depositValue);
+      if (currencyCode === 'WETH') {
+        deposit();
+        setIsLoading(false);
+        return;
+      }
+
+      sendEth();
     }
 
     if (currencyCode === 'WETH') {
@@ -47,7 +52,7 @@ export const useDeposit = () => {
   return { handleDeposit, isLoading, isError, depositValue, setDepositValue };
 };
 
-const parseEther = (value: number) => {
+export const parseEther = (value: number) => {
   if (!value || value === 0) {
     return ethers.utils.parseEther('0');
   }
