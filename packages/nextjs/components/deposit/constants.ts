@@ -1,13 +1,13 @@
 export const WETH_CONTRACT_ADDRESS = '0xCCB14936C2E000ED8393A571D15A2672537838Ad';
 
-export const SOLIDVAULT_CONTRACT_ADDRESS = '0x75e045C15D91f5310d886Ea96AffdD3Bf182c29E';
+export const SOLIDVAULT_CONTRACT_ADDRESS = '0x53203c23A6FfB9fa56520CaEA2c1fB2D07A31EFB';
 
 export const SOLIDVAULT_ABI = [
   {
     inputs: [
       {
         internalType: 'contract ERC20',
-        name: '_token',
+        name: '_UNDERLYING',
         type: 'address',
       },
       {
@@ -83,6 +83,25 @@ export const SOLIDVAULT_ABI = [
       },
     ],
     name: 'Deposit',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'newFeePercent',
+        type: 'uint256',
+      },
+    ],
+    name: 'FeePercentUpdated',
     type: 'event',
   },
   {
@@ -174,6 +193,19 @@ export const SOLIDVAULT_ABI = [
         internalType: 'bytes32',
         name: '',
         type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'UNDERLYING',
+    outputs: [
+      {
+        internalType: 'contract ERC20',
+        name: '',
+        type: 'address',
       },
     ],
     stateMutability: 'view',
@@ -389,6 +421,43 @@ export const SOLIDVAULT_ABI = [
       },
     ],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'feePercent',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'asset',
+        type: 'address',
+      },
+    ],
+    name: 'getReserveData',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'liquidityRate',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint40',
+        name: 'lastUpdateTimestamp',
+        type: 'uint40',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -707,6 +776,19 @@ export const SOLIDVAULT_ABI = [
   {
     inputs: [
       {
+        internalType: 'uint256',
+        name: 'newFeePercent',
+        type: 'uint256',
+      },
+    ],
+    name: 'setFeePercent',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'address',
         name: 'newOwner',
         type: 'address',
@@ -750,6 +832,19 @@ export const SOLIDVAULT_ABI = [
       {
         internalType: 'uint256',
         name: 'totalUnderlyingHeld',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'totalFloat',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
         type: 'uint256',
       },
     ],

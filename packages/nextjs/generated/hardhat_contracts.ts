@@ -5,13 +5,13 @@ export default {
       chainId: "5",
       contracts: {
         SolidVault: {
-          address: "0x63A837fF7a06f1b753E925C0fb3F211a09E462A7",
+          address: "0x53203c23A6FfB9fa56520CaEA2c1fB2D07A31EFB",
           abi: [
             {
               inputs: [
                 {
                   internalType: "contract ERC20",
-                  name: "_token",
+                  name: "_UNDERLYING",
                   type: "address",
                 },
                 {
@@ -87,6 +87,25 @@ export default {
                 },
               ],
               name: "Deposit",
+              type: "event",
+            },
+            {
+              anonymous: false,
+              inputs: [
+                {
+                  indexed: true,
+                  internalType: "address",
+                  name: "user",
+                  type: "address",
+                },
+                {
+                  indexed: false,
+                  internalType: "uint256",
+                  name: "newFeePercent",
+                  type: "uint256",
+                },
+              ],
+              name: "FeePercentUpdated",
               type: "event",
             },
             {
@@ -178,6 +197,19 @@ export default {
                   internalType: "bytes32",
                   name: "",
                   type: "bytes32",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "UNDERLYING",
+              outputs: [
+                {
+                  internalType: "contract ERC20",
+                  name: "",
+                  type: "address",
                 },
               ],
               stateMutability: "view",
@@ -393,6 +425,19 @@ export default {
                 },
               ],
               stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "feePercent",
+              outputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              stateMutability: "view",
               type: "function",
             },
             {
@@ -735,6 +780,19 @@ export default {
             {
               inputs: [
                 {
+                  internalType: "uint256",
+                  name: "newFeePercent",
+                  type: "uint256",
+                },
+              ],
+              name: "setFeePercent",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
                   internalType: "address",
                   name: "newOwner",
                   type: "address",
@@ -778,6 +836,19 @@ export default {
                 {
                   internalType: "uint256",
                   name: "totalUnderlyingHeld",
+                  type: "uint256",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "totalFloat",
+              outputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
                   type: "uint256",
                 },
               ],

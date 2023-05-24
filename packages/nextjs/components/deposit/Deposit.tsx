@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import { useDeposit } from '../../hooks/other/useDeposit';
-import { useSovBalance } from '../../hooks/other/useSovBalance';
 import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
   Box,
   Button,
   Divider,
@@ -29,9 +24,16 @@ interface DepositProps {
   apy: DataPool['apy'];
 }
 
+// Questions for Matteo:
+// 1. What am I doing wrong with the WETH deposit? I still get the UNPREDICTABLE_GAS_LIMIT error. - I have deployed the contract and updated the SOLIDVAULT_CONTRACT_ADDRESS
+// 2. useWaitForTransaction hook takes a hash property that is throwing a lint error. Is there a best way to handle this? Eg. a util to remove the 0x and then add it as a template literal?
+
+// TODO: Can we watch approve transaction, force a rerender and update the UI once it is complete? Currently you need to refresh the page.
+// TODO: Check the APY is coming from the correct pool address
+
 export const Deposit = ({ apy }: DepositProps) => {
-  const { wethApprove, allowance } = useApprove();
-  const { handleDeposit, isLoading, isError, depositValue, setDepositValue } = useDeposit();
+  const { approve, allowance } = useApprove();
+  const { handleDeposit, depositValue, setDepositValue, isDepositProcessing } = useDeposit();
   const [currencyCode, setCurrencyCode] = useState<CurrencyCode>('ETH');
   const noAllowanceSet = Number(ethers.utils.formatEther(allowance)) === 0;
   const allowanceToLow = Number(depositValue) > Number(ethers.utils.formatEther(allowance));
@@ -39,7 +41,6 @@ export const Deposit = ({ apy }: DepositProps) => {
 
   return (
     <TabPanel px={0} pt={6}>
-      {isError && <Error />}
       <form>
         <Grid gridTemplateColumns={'1.4fr 1fr'} gap={4} mb={5}>
           <GridItem>
@@ -69,7 +70,7 @@ export const Deposit = ({ apy }: DepositProps) => {
           </Text>
         </Box>
         {(isWeth && noAllowanceSet) || (isWeth && allowanceToLow) ? (
-          <Button colorScheme="green" mb="2" width="100%" onClick={wethApprove}>
+          <Button colorScheme="green" mb="2" width="100%" onClick={() => approve(depositValue)}>
             Approve
           </Button>
         ) : (
@@ -77,24 +78,12 @@ export const Deposit = ({ apy }: DepositProps) => {
             colorScheme="purple"
             width="100%"
             onClick={() => handleDeposit({ currencyCode })}
-            isDisabled={depositValue <= 0 || isError}
-            isLoading={isLoading}>
+            isDisabled={depositValue <= 0}
+            isLoading={isDepositProcessing}>
             Deposit
           </Button>
         )}
       </form>
     </TabPanel>
-  );
-};
-
-const Error = () => {
-  return (
-    <Box mb="6">
-      <Alert status="error">
-        <AlertIcon />
-        <AlertTitle>Unable to allow deposits</AlertTitle>
-        <AlertDescription>Please try again later.</AlertDescription>
-      </Alert>
-    </Box>
   );
 };
