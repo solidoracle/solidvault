@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { CurrencyCode } from '../../components/deposit';
+import { SOLIDVAULT_CONTRACT_ADDRESS } from '../../components/deposit/constants';
 import { useScaffoldContractWrite } from '../scaffold-eth';
 import { ethers } from 'ethers';
-import { useAccount } from 'wagmi';
+import { useAccount, usePrepareSendTransaction, useSendTransaction } from 'wagmi';
 import useApprove from '~~/hooks/other/useApprove';
 
 export const useDeposit = () => {
@@ -18,11 +19,10 @@ export const useDeposit = () => {
     args: [parseEther(depositValue), address],
   });
 
-  const { writeAsync: receive } = useScaffoldContractWrite({
-    contractName: 'SolidVault',
-    functionName: 'receive',
-    args: [parseEther(depositValue), address],
+  const { config } = usePrepareSendTransaction({
+    request: { to: SOLIDVAULT_CONTRACT_ADDRESS, value: parseEther(depositValue) },
   });
+  const { sendTransaction: sendEth } = useSendTransaction(config);
 
   const handleDeposit = ({ currencyCode }: CurrencyCode) => {
     setIsLoading(true);
@@ -39,7 +39,7 @@ export const useDeposit = () => {
       return;
     }
 
-    receive();
+    sendEth();
     setIsLoading(false);
     return;
   };

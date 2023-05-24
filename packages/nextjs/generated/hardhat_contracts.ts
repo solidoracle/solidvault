@@ -5,13 +5,13 @@ export default {
       chainId: "5",
       contracts: {
         SolidVault: {
-          address: "0x63A837fF7a06f1b753E925C0fb3F211a09E462A7",
+          address: "0x1D5F2b50179C912dC5ED9F6b6Bec65C4BeF28f17",
           abi: [
             {
               inputs: [
                 {
                   internalType: "contract ERC20",
-                  name: "_token",
+                  name: "_UNDERLYING",
                   type: "address",
                 },
                 {
@@ -87,6 +87,25 @@ export default {
                 },
               ],
               name: "Deposit",
+              type: "event",
+            },
+            {
+              anonymous: false,
+              inputs: [
+                {
+                  indexed: true,
+                  internalType: "address",
+                  name: "user",
+                  type: "address",
+                },
+                {
+                  indexed: false,
+                  internalType: "uint256",
+                  name: "newFeePercent",
+                  type: "uint256",
+                },
+              ],
+              name: "FeePercentUpdated",
               type: "event",
             },
             {
@@ -178,6 +197,19 @@ export default {
                   internalType: "bytes32",
                   name: "",
                   type: "bytes32",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "UNDERLYING",
+              outputs: [
+                {
+                  internalType: "contract ERC20",
+                  name: "",
+                  type: "address",
                 },
               ],
               stateMutability: "view",
@@ -393,6 +425,19 @@ export default {
                 },
               ],
               stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "feePercent",
+              outputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
+                  type: "uint256",
+                },
+              ],
+              stateMutability: "view",
               type: "function",
             },
             {
@@ -735,6 +780,19 @@ export default {
             {
               inputs: [
                 {
+                  internalType: "uint256",
+                  name: "newFeePercent",
+                  type: "uint256",
+                },
+              ],
+              name: "setFeePercent",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function",
+            },
+            {
+              inputs: [
+                {
                   internalType: "address",
                   name: "newOwner",
                   type: "address",
@@ -778,6 +836,19 @@ export default {
                 {
                   internalType: "uint256",
                   name: "totalUnderlyingHeld",
+                  type: "uint256",
+                },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+            {
+              inputs: [],
+              name: "totalFloat",
+              outputs: [
+                {
+                  internalType: "uint256",
+                  name: "",
                   type: "uint256",
                 },
               ],
@@ -889,148 +960,6 @@ export default {
                   type: "uint256",
                 },
               ],
-              stateMutability: "nonpayable",
-              type: "function",
-            },
-            {
-              stateMutability: "payable",
-              type: "receive",
-            },
-          ],
-        },
-        YourContract: {
-          address: "0x2337c953C1BC56D5e1faCD5BF389b81D17dd9B32",
-          abi: [
-            {
-              inputs: [
-                {
-                  internalType: "address",
-                  name: "_owner",
-                  type: "address",
-                },
-              ],
-              stateMutability: "nonpayable",
-              type: "constructor",
-            },
-            {
-              anonymous: false,
-              inputs: [
-                {
-                  indexed: false,
-                  internalType: "address",
-                  name: "greetingSetter",
-                  type: "address",
-                },
-                {
-                  indexed: false,
-                  internalType: "string",
-                  name: "newGreeting",
-                  type: "string",
-                },
-                {
-                  indexed: false,
-                  internalType: "bool",
-                  name: "premium",
-                  type: "bool",
-                },
-                {
-                  indexed: false,
-                  internalType: "uint256",
-                  name: "value",
-                  type: "uint256",
-                },
-              ],
-              name: "GreetingChange",
-              type: "event",
-            },
-            {
-              inputs: [],
-              name: "greeting",
-              outputs: [
-                {
-                  internalType: "string",
-                  name: "",
-                  type: "string",
-                },
-              ],
-              stateMutability: "view",
-              type: "function",
-            },
-            {
-              inputs: [],
-              name: "owner",
-              outputs: [
-                {
-                  internalType: "address",
-                  name: "",
-                  type: "address",
-                },
-              ],
-              stateMutability: "view",
-              type: "function",
-            },
-            {
-              inputs: [],
-              name: "premium",
-              outputs: [
-                {
-                  internalType: "bool",
-                  name: "",
-                  type: "bool",
-                },
-              ],
-              stateMutability: "view",
-              type: "function",
-            },
-            {
-              inputs: [
-                {
-                  internalType: "string",
-                  name: "_newGreeting",
-                  type: "string",
-                },
-              ],
-              name: "setGreeting",
-              outputs: [],
-              stateMutability: "payable",
-              type: "function",
-            },
-            {
-              inputs: [],
-              name: "totalCounter",
-              outputs: [
-                {
-                  internalType: "uint256",
-                  name: "",
-                  type: "uint256",
-                },
-              ],
-              stateMutability: "view",
-              type: "function",
-            },
-            {
-              inputs: [
-                {
-                  internalType: "address",
-                  name: "",
-                  type: "address",
-                },
-              ],
-              name: "userGreetingCounter",
-              outputs: [
-                {
-                  internalType: "uint256",
-                  name: "",
-                  type: "uint256",
-                },
-              ],
-              stateMutability: "view",
-              type: "function",
-            },
-            {
-              inputs: [],
-              name: "withdraw",
-              outputs: [],
               stateMutability: "nonpayable",
               type: "function",
             },

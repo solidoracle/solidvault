@@ -35,20 +35,24 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
     using SafeCastLib for uint256;
     uint256 internal immutable BASE_UNIT;
     uint256 public totalHoldings;
-    uint256 public strategyBalance;
+    uint256 public strategyBalance; // used in harvest, but not set in deposit or deducted from withdraw
+    ERC20 public immutable UNDERLYING;
+    uint256 public feePercent;
+
 
     // https://docs.aave.com/developers/deployed-contracts/v3-testnet-addresses
     address public immutable aaveLendingPoolAddress; 
     address public immutable aaveRewards;
 
-    constructor(ERC20 _token, address _owner, address _aaveLendingPoolAddress, address _aaveRewards)
-        ERC4626(_token, "SolidVault", "SOV")
+    constructor(ERC20 _UNDERLYING, address _owner, address _aaveLendingPoolAddress, address _aaveRewards)
+        ERC4626(_UNDERLYING, "SolidVault", "SOV")
         Owned(_owner)
     {
         aaveLendingPoolAddress = _aaveLendingPoolAddress;
         aaveRewards = _aaveRewards;
         // implicitly inherited from ERC20, which is passed as an argument to the ERC4626 constructor. 
         BASE_UNIT = 10**decimals;
+        UNDERLYING = _UNDERLYING;
     }
 
     /*///////////////////////////////////////////////////////////////
@@ -103,6 +107,10 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
         unchecked {
             totalUnderlyingHeld = totalHoldings;
         }
+    }
+
+    function totalFloat() public view returns (uint256) {
+        return UNDERLYING.balanceOf(address(this));
     }
     
     /*///////////////////////////////////////////////////////////////
@@ -159,6 +167,23 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
     // TODO: not sure when to call this
     function claimAaveRewards(address[] calldata _assets, address _to) external onlyOwner {
         IRewardsController(aaveRewards).claimAllRewards(_assets, _to);
+    }
+
+    /// @notice Emitted when the fee percentage is updated.
+    /// @param user The authorized user who triggered the update.
+    /// @param newFeePercent The new fee percentage.
+    event FeePercentUpdated(address indexed user, uint256 newFeePercent);
+
+    /// @notice Sets a new fee percentage.
+    /// @param newFeePercent The new fee percentage.
+    function setFeePercent(uint256 newFeePercent) external onlyOwner {
+        // A fee percentage over 100% doesn't make sense.
+        require(newFeePercent <= 1e18, "FEE_TOO_HIGH");
+
+        // Update the fee percentage.
+        feePercent = newFeePercent;
+
+        emit FeePercentUpdated(msg.sender, newFeePercent);
     }
 
     /*///////////////////////////////////////////////////////////////
