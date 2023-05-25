@@ -1,9 +1,15 @@
 import { useState } from 'react';
 import { CurrencyCode } from '../../components/deposit';
-import { SOLIDVAULT_CONTRACT_ADDRESS } from '../../components/deposit/constants';
-import { useScaffoldContractWrite } from '../scaffold-eth';
+import { SOLIDVAULT_ABI, SOLIDVAULT_CONTRACT_ADDRESS } from '../../components/deposit/constants';
 import { ethers } from 'ethers';
-import { useAccount, usePrepareSendTransaction, useSendTransaction, useWaitForTransaction } from 'wagmi';
+import {
+  useAccount,
+  useContractWrite,
+  usePrepareContractWrite,
+  usePrepareSendTransaction,
+  useSendTransaction,
+  useWaitForTransaction,
+} from 'wagmi';
 import useApprove from '~~/hooks/other/useApprove';
 
 export const useDeposit = () => {
@@ -12,11 +18,15 @@ export const useDeposit = () => {
   const [depositValue, setDepositValue] = useState(0);
   const [sendTransactionHash, setSendTransactionHash] = useState('');
 
-  // useScaffoldContractWrite writes to the specified function in the specified contract.
-  const { writeAsync: deposit } = useScaffoldContractWrite({
-    contractName: 'SolidVault',
+  const { config: depositConfig } = usePrepareContractWrite({
+    address: SOLIDVAULT_CONTRACT_ADDRESS,
+    abi: SOLIDVAULT_ABI,
     functionName: 'deposit',
     args: [parseEther(depositValue), address],
+  });
+
+  const { write: deposit } = useContractWrite({
+    ...depositConfig,
   });
 
   // usePrepareSendTransaction is used to prepare the config that is passed to useSendTransaction (as recommended by Wagmi docs)
@@ -33,7 +43,7 @@ export const useDeposit = () => {
   // useWaitForTransaction takes the hash of a processing transaction and provides updates on where the transaction is up to.
   const { isLoading: isDepositProcessing } = useWaitForTransaction({
     enabled: !!sendTransactionHash,
-    hash: sendTransactionHash,
+    hash: sendTransactionHash as `0x${string}`,
     // TODO: onSuccess: Show success toast message
     onSuccess: (data: any) => console.log('completed', data),
     // TODO: onError: Show error toast message
@@ -45,12 +55,19 @@ export const useDeposit = () => {
       if (allowance.lt(parseEther(depositValue))) {
         approve(depositValue);
       }
+
+      console.log({ deposit });
+      if (!deposit) {
+        // TODO: Handle deposit not existing
+        return;
+      }
+
       deposit();
       return;
     }
 
     if (!sendEth) {
-      // TODO: Handle sendETH not existing properly - or will it always exist?
+      // TODO: Handle sendETH not existing
       return;
     }
 
