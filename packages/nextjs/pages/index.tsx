@@ -6,29 +6,18 @@ import {
   AlertIcon,
   AlertTitle,
   Box,
-  Button,
   Container,
-  Divider,
-  Icon,
-  IconButton,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Spinner,
   Tab,
   TabList,
   TabPanels,
   Tabs,
+  Text,
 } from '@chakra-ui/react';
 import type { NextPage } from 'next';
-import { MdSettings } from 'react-icons/md';
 import { Deposit } from '~~/components/deposit';
 import { Withdraw } from '~~/components/withdraw';
+import { useSovBalance } from '~~/hooks/other/useSovBalance';
 import { useGetDataPoolsQuery } from '~~/queries/useGetDataPoolsQuery';
 
 // TODO: Color variables (/color scheme)
@@ -36,6 +25,7 @@ import { useGetDataPoolsQuery } from '~~/queries/useGetDataPoolsQuery';
 
 const Home: NextPage = () => {
   const { data: poolData, isLoading, isError } = useGetDataPoolsQuery(); // TODO: Still not sure this is the right pool?
+  const { sovBalance } = useSovBalance();
 
   if (isLoading) {
     return (
@@ -81,6 +71,9 @@ const Home: NextPage = () => {
               <Withdraw />
             </TabPanels>
           </Tabs>
+          <Text fontSize="md" fontWeight="medium" color="gray.400">
+            SOV Balance: {sovBalance}
+          </Text>
         </Container>
       </main>
     </>
