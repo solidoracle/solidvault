@@ -1,15 +1,14 @@
-import { useScaffoldContractRead } from '../scaffold-eth';
 import { ethers } from 'ethers';
-import { useAccount } from 'wagmi';
+import { useAccount, useBalance } from 'wagmi';
+import { SOLIDVAULT_TOKEN_ADDRESS } from '~~/utils/constants';
 
 export const useSovBalance = () => {
   const { address } = useAccount();
 
-  const { data: sovBalance } = useScaffoldContractRead({
-    contractName: 'SolidVault',
-    functionName: 'balanceOf',
-    args: [address],
+  const { data: sovBalance } = useBalance({
+    address: address,
+    token: SOLIDVAULT_TOKEN_ADDRESS,
   });
 
-  return { sovBalance: sovBalance ? ethers.utils.formatEther(sovBalance) : '0.000' };
+  return { sovBalance: sovBalance?.formatted ? sovBalance.formatted : '0.000' };
 };

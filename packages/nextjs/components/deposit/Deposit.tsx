@@ -17,7 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import { Error } from '~~/components/error';
-import useApprove from '~~/hooks/other/useApprove';
+import { useApprove } from '~~/hooks/other/useApprove';
 import { useEthBalance } from '~~/hooks/other/useEthBalance';
 import { useWethBalance } from '~~/hooks/other/useWethBalance';
 import { DataPool } from '~~/services/aave/getDataPools';
