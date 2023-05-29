@@ -6,38 +6,26 @@ import {
   AlertIcon,
   AlertTitle,
   Box,
-  Button,
   Container,
-  Divider,
-  Icon,
-  IconButton,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Spinner,
   Tab,
   TabList,
   TabPanels,
   Tabs,
+  Text,
 } from '@chakra-ui/react';
 import type { NextPage } from 'next';
-import { MdSettings } from 'react-icons/md';
 import { Deposit } from '~~/components/deposit';
 import { Withdraw } from '~~/components/withdraw';
+import { useSovBalance } from '~~/hooks/other/useSovBalance';
 import { useGetDataPoolsQuery } from '~~/queries/useGetDataPoolsQuery';
 
 // TODO: Color variables (/color scheme)
 // TODO: Add a QueryLoader
 
 const Home: NextPage = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [slippage, setSlippage] = useState(0.5);
   const { data: poolData, isLoading, isError } = useGetDataPoolsQuery(); // TODO: Still not sure this is the right pool?
+  const { sovBalance } = useSovBalance();
 
   if (isLoading) {
     return (
@@ -77,54 +65,16 @@ const Home: NextPage = () => {
                 <Tab>Deposit</Tab>
                 <Tab>Withdraw</Tab>
               </Box>
-              <Box>
-                <IconButton
-                  size="lg"
-                  bg="transparent"
-                  icon={<Icon as={MdSettings} />}
-                  aria-label="Slippage"
-                  onClick={() => setIsModalOpen(true)}
-                />
-              </Box>
             </TabList>
             <TabPanels>
               <Deposit apy={poolData[0].apy} />
               <Withdraw />
             </TabPanels>
           </Tabs>
+          <Text fontSize="md" fontWeight="medium" color="gray.400">
+            SOV Balance: {sovBalance}
+          </Text>
         </Container>
-
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Slippage %</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Box display="flex" gap={2}>
-                <Button colorScheme="purple" variant="outline" onClick={() => setSlippage(0.5)}>
-                  0.5
-                </Button>
-                <Button colorScheme="purple" variant="outline" onClick={() => setSlippage(1.0)}>
-                  1.0
-                </Button>
-              </Box>
-              <Divider my={4} />
-              <Input
-                placeholder="Custom slippage"
-                type="number"
-                borderColor="purple.500"
-                value={slippage}
-                onChange={e => setSlippage(e.target.valueAsNumber)}
-              />
-            </ModalBody>
-
-            <ModalFooter>
-              <Button colorScheme="purple" mr={3} onClick={() => setIsModalOpen(false)}>
-                Apply
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
       </main>
     </>
   );
