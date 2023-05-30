@@ -1,3 +1,4 @@
+import { Error } from '../Error';
 import {
   Box,
   Button,
@@ -13,7 +14,6 @@ import {
   TabPanel,
   Text,
 } from '@chakra-ui/react';
-import { Error } from '~~/components/error';
 import { useSovBalance } from '~~/hooks/other/useSovBalance';
 import { useWithdraw } from '~~/hooks/other/useWithdraw';
 
