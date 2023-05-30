@@ -20,7 +20,7 @@ import { useWithdraw } from '~~/hooks/other/useWithdraw';
 export const Withdraw = () => {
   const { sovBalance } = useSovBalance();
   const { handleWithdraw, withdrawValue, setWithdrawValue, isWithdrawProcessing } = useWithdraw();
-  const insufficientFunds = sovBalance < withdrawValue;
+  const insufficientFunds = Number(sovBalance) < withdrawValue;
 
   return (
     <TabPanel px={0}>
@@ -46,7 +46,7 @@ export const Withdraw = () => {
           </GridItem>
         </Grid>
         <Divider orientation="horizontal" />
-        <Button colorScheme="purple" width="100%" isLoading={isWithdrawProcessing} onClick={handleWithdraw}>
+        <Button colorScheme="purple" width="100%" isLoading={isWithdrawProcessing} onClick={() => handleWithdraw?.()}>
           Withdraw
         </Button>
         {insufficientFunds && (

@@ -12,14 +12,14 @@ import { parseEther } from '~~/utils/parseEther';
 
 export const useWithdraw = () => {
   const { address } = useAccount();
-  const [withdrawValue, setWithdrawValue] = useState();
+  const [withdrawValue, setWithdrawValue] = useState(0);
   const [withdrawHash, setWithdrawHash] = useState('');
 
   const { config: withdrawConfig } = usePrepareContractWrite({
     address: SOLIDVAULT_CONTRACT_ADDRESS,
     abi: SOLIDVAULT_ABI,
     functionName: 'withdraw',
-    args: [withdrawValue, address, SOLIDVAULT_CONTRACT_ADDRESS],
+    args: [parseEther(withdrawValue), address, address],
   });
 
   const { write: withdraw } = useContractWrite({
