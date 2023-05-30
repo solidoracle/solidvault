@@ -4,10 +4,9 @@
 
 Smart Vault that uses the solmate erc4626 contract to deposit weth on aave and earn yield.
 
-## Frontend
+## Start Frontend
 
 ```bash
-  cd packages/nextjs
   yarn start
 ```
 
@@ -16,6 +15,7 @@ Smart Vault that uses the solmate erc4626 contract to deposit weth on aave and e
 Create an .env file using the .env.example file as a template.
 To run tests forking from mainnet, run the following command
 
+For testing on a Goerli fork
 ```bash
   cd packages/hardhat
   make test-goerli
