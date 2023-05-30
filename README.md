@@ -2,7 +2,7 @@
 
 ## Overview
 
-Solidvault is a vault that leverages the solmate library erc4626 contract to allow for depositing weth on AAVE and earn yield.
+Solidvault is a vault that leverages the solmate library erc4626 contract to allow for depositing WETH on AAVE and earn yield.
 
 You can deposit either goerli ETH directly, or WETH(must be wrapped at this address 0xCCB14936C2E000ED8393A571D15A2672537838Ad for it to work)
 
