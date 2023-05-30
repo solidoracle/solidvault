@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { ethers } from 'ethers';
 import {
   useAccount,
   useContractWrite,
@@ -9,8 +8,9 @@ import {
   useWaitForTransaction,
 } from 'wagmi';
 import { CurrencyCode } from '~~/components/deposit';
-import useApprove from '~~/hooks/other/useApprove';
+import { useApprove } from '~~/hooks/other/useApprove';
 import { SOLIDVAULT_ABI, SOLIDVAULT_CONTRACT_ADDRESS } from '~~/utils/constants';
+import { parseEther } from '~~/utils/parseEther';
 
 export const useDeposit = () => {
   const { address } = useAccount();
@@ -82,12 +82,4 @@ export const useDeposit = () => {
     setDepositValue,
     isDepositProcessing: isEthDepositProcessing || isWethDepositProcessing,
   };
-};
-
-// TODO: Move to a util
-export const parseEther = (value: number) => {
-  if (!value || value === 0) {
-    return ethers.utils.parseEther('0');
-  }
-  return ethers.utils.parseEther(value.toString());
 };

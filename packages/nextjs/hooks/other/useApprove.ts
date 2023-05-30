@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { parseEther } from './useDeposit';
 import { BigNumber } from 'ethers';
 import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi';
 import { SOLIDVAULT_CONTRACT_ADDRESS, WETH_ABI, WETH_CONTRACT_ADDRESS } from '~~/utils/constants';
+import { parseEther } from '~~/utils/parseEther';
 
-export default function useApprove() {
+export const useApprove = () => {
   const [allowance, setAllowance] = useState(BigNumber.from('0'));
   const [approveAmount, setApproveAmount] = useState(0);
   const { address } = useAccount();
@@ -49,4 +49,4 @@ export default function useApprove() {
   };
 
   return { allowance, approve, isApproveProcessing };
-}
+};
