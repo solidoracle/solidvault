@@ -38,7 +38,6 @@ export const useWithdraw = () => {
   });
 
   const handleWithdraw = () => {
-    console.log('here', { withdrawConfig });
     withdraw?.();
   };
 

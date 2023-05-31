@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useDeposit } from '../../hooks/other/useDeposit';
-import { Error } from '../Error';
 import {
   Box,
   Button,
@@ -17,6 +16,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
+import { Error } from '~~/components/Error';
 import { useApprove } from '~~/hooks/other/useApprove';
 import { useEthBalance } from '~~/hooks/other/useEthBalance';
 import { useWethBalance } from '~~/hooks/other/useWethBalance';
