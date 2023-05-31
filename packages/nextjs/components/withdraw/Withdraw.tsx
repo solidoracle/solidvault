@@ -1,11 +1,8 @@
-import { Error } from '../Error';
 import {
-  Box,
   Button,
   Divider,
   Grid,
   GridItem,
-  Input,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -14,6 +11,7 @@ import {
   TabPanel,
   Text,
 } from '@chakra-ui/react';
+import { Error } from '~~/components/Error';
 import { useSovBalance } from '~~/hooks/other/useSovBalance';
 import { useWithdraw } from '~~/hooks/other/useWithdraw';
 

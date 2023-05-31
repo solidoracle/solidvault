@@ -61,7 +61,7 @@ export const useDeposit = () => {
     // TODO: onError: Show error toast message
   });
 
-  const handleDeposit = ({ currencyCode }: CurrencyCode) => {
+  const handleDeposit = ({ currencyCode }: { currencyCode: CurrencyCode }) => {
     // if 'WETH' we need to make sure the user has approved the value of WETH before allowing them to deposit.
     if (currencyCode === 'WETH') {
       if (allowance.lt(parseEther(depositValue))) {
