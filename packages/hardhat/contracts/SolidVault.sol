@@ -8,7 +8,9 @@ import "solmate/src/utils/ReentrancyGuard.sol";
 import "solmate/src/utils/SafeCastLib.sol";
 import "solmate/src/tokens/WETH.sol";
 import "./Interfaces/aave/IPool.sol";
+import "./Interfaces/aave/IAWETH.sol";
 import "./Interfaces/aave/IRewardsController.sol";
+import  { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {console} from "../lib/forge-std/src/console.sol";
 
 
@@ -121,39 +123,47 @@ contract SolidVault is ERC4626, Owned, ReentrancyGuard {
         // Get the Vault's current total strategy holdings.
         uint256 oldTotalHoldings = totalHoldings;
 
-        // Used to store the total profit accrued by the strategies.
+        // Used to store the total profit accrued by the aave strategy.
         uint256 totalProfitAccrued;
 
         // Used to store the new total strategy holdings after harvesting.
         uint256 newTotalHoldings = oldTotalHoldings;
-
+    
         // Get the strategy's previous and current balance.
-        uint256 balanceLastHarvest = strategyBalance;
-        (uint256 totalCollateralETH,,,,,) = IPool(aaveLendingPoolAddress).getUserAccountData(address(asset));
+        uint256 balanceLastHarvest = totalHoldings; // could use strategyBalance?
 
-        uint256 balanceThisHarvest = totalCollateralETH;
-        strategyBalance = balanceThisHarvest;
+        IPool aaveLendingPool = IPool(aaveLendingPoolAddress);
 
-        // Increase/decrease newTotalStrategyHoldings based on the profit/loss registered.
-        // We cannot wrap the subtraction in parenthesis as it would underflow if the strategy had a loss.
+        DataTypes.ReserveData memory reserveData = aaveLendingPool.getReserveData(address(asset));
+        address aWETHAddress = reserveData.aTokenAddress;
+        uint256 index = reserveData.liquidityIndex;
+
+        IAWETH aWETH = IAWETH(aWETHAddress);
+
+        uint256 scaledBalance = aWETH.scaledBalanceOf(address(this));
+        uint256 intermediateResult = FixedPointMathLib.mulWadDown(scaledBalance, index);
+        uint balanceThisHarvest = FixedPointMathLib.mulDivDown(intermediateResult, 1e18, 1e27);
+
+        // Increase/decrease newTotalHoldings based on the profit/loss registered.
         newTotalHoldings = newTotalHoldings + balanceThisHarvest - balanceLastHarvest;
-
-        totalProfitAccrued += balanceThisHarvest > balanceLastHarvest
-                    ? balanceThisHarvest - balanceLastHarvest // Profits since last harvest.
-                    : 0; // If the strategy registered a net loss we don't have any new profit.
-
+        
+        unchecked {
+            // Update the total profit accrued while counting losses as zero profit.
+            totalProfitAccrued += balanceThisHarvest > balanceLastHarvest
+                ? balanceThisHarvest - balanceLastHarvest // Profits since last harvest.
+                : 0; // If the strategy registered a net loss we don't have any new profit.
+        }
 
         // Compute fees as the fee percent multiplied by the profit.
-        // No fees at the moment
-        uint256 feesAccrued = totalProfitAccrued.mulDivDown(0, 1e18);
-
-        // If we accrued any fees, mint an equivalent amount of vault tokens.
-        // Authorized users can claim the newly minted tokens via claimFees.
+        uint256 feesAccrued = totalProfitAccrued.mulDivDown(feePercent, 1e18);
+    
+        // If we accrued any fees, mint an equivalent amount of rvTokens.
         _mint(address(this), feesAccrued.mulDivDown(BASE_UNIT, convertToAssets(BASE_UNIT)));
-
-        // Set strategy holdings to our new total.
+    
+        // Set total holdings to our new total.
         totalHoldings = newTotalHoldings;
     }
+    
 
     /*///////////////////////////////////////////////////////////////
                              FEE & REWARD CLAIM LOGIC

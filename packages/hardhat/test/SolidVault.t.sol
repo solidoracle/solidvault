@@ -46,8 +46,7 @@ contract SolidVaultTest is Test {
     }
 
 
-    function testETHDeposit() public {
-        weth.approve(address(solidVault), 1 ether);
+    function testETHDeposit() private {
         (bool success, ) = address(solidVault).call{value: 1 ether}("");
 
         assertEq(solidVault.totalHoldings(), 1 ether);      
@@ -60,17 +59,12 @@ contract SolidVaultTest is Test {
         assertEq(aWETH.balanceOf(address(solidVault)), 1 ether);
     }
 
-    function testETHDepositFuzz(uint amount) public {
+    function testETHDepositFuzz(uint amount) private {
         amount = bound(amount, 0, address(this).balance);
-
-        weth.approve(address(solidVault), amount);
-
         (bool success, ) = address(solidVault).call{value: amount}("");
 
         assertEq(solidVault.totalHoldings(), amount);      
         assertEq(solidVault.balanceOf(address(this)), amount); 
-
-        IPool aaveLendingPool = IPool(aaveLendingPoolAddress);
     }
 
     function testWETHDeposit() private {
@@ -124,17 +118,10 @@ contract SolidVaultTest is Test {
 
     }
 
-    function testWithdrawFuzz(uint amount) private {
-        amount = bound(amount, 0, address(this).balance);
+    function testWithdrawFuzz(uint amount) public {
+        amount = bound(amount, 0, address(this).balance); // for mainnet fork best to bound to a fixed amount, as Aave deposit otherwise can fail
 
-        weth.deposit{value: amount}();
-        // approve
-        weth.approve(address(solidVault), amount);
-        // we MUST approve solidVault or other address to spend our vault tokens in case they are the ones calling withdraw
-        solidVault.approve( address(solidVault), amount);
-
-        // deposit on aave
-        solidVault.deposit(amount, address(this));
+        (bool success, ) = address(solidVault).call{value: amount}("");
 
         // withdraw
         uint shares = solidVault.balanceOf(address(this));
@@ -149,12 +136,13 @@ contract SolidVaultTest is Test {
     
         for (uint i = 0; i < users.length; i++) {
             address user = users[i];
-            uint randomAmount = bound((uint(keccak256(abi.encodePacked(user, block.timestamp))) % 1 ether), 0, address(this).balance);
+            uint randomAmount = bound((uint(keccak256(abi.encodePacked(user, block.timestamp))) % 1 ether), 0, 100 ether);
             
             // Send Ether to the user
             (bool success,) = user.call{value: randomAmount}("");
             require(success, "Transfer failed");
-    
+            vm.startPrank(address(user));
+
             // Each user wraps ETH and approves SolidVault
             WETHInterface(weth).deposit{value: randomAmount}();
             weth.approve(address(solidVault), randomAmount);
@@ -163,6 +151,7 @@ contract SolidVaultTest is Test {
             solidVault.deposit(randomAmount, user);
 
             totalDeposit += randomAmount;
+            vm.stopPrank();
         }
     
         // Confirm total deposits
@@ -185,11 +174,95 @@ contract SolidVaultTest is Test {
     }
     
 
+    function testHarvest() private {
+        uint depositAmount = 1 ether;
+
+        (bool success, ) = address(solidVault).call{value: depositAmount}("");
+
+        assertEq(solidVault.totalHoldings(), depositAmount);      
+        assertEq(solidVault.balanceOf(address(this)), depositAmount); 
+
+        IPool aaveLendingPool = IPool(aaveLendingPoolAddress);
+
+        address aWETHAddress = aaveLendingPool.getReserveData(address(weth)).aTokenAddress;
+        IAWETH aWETH = IAWETH(aWETHAddress);
+        assertEq(aWETH.balanceOf(address(solidVault)), depositAmount);
+
+        uint256 scaledBalanceBefore = aWETH.scaledBalanceOf(address(solidVault));
+
+        // Advance the blockchain by a certain number of blocks to simulate time passing
+        vm.warp(block.timestamp + 365 days);
+
+        // someone else deposits for the update of the liquidity index, and the update of the interest rate
+        vm.startPrank(address(owner));
+        weth.deposit{value: 1 ether}();
+        IERC20(weth).approve(address(aaveLendingPool), 1 ether);
+        aaveLendingPool.supply(address(weth), 1 ether, owner, 0);
+
+        uint256 scaledBalance = aWETH.scaledBalanceOf(address(solidVault));
+        uint256 intermediateResult = FixedPointMathLib.mulWadDown(scaledBalance, aaveLendingPool.getReserveData(address(weth)).liquidityIndex);
+        uint balanceThisHarvest = FixedPointMathLib.mulDivDown(intermediateResult, 1e18, 1e27);
+
+        uint256 expectedYield = balanceThisHarvest - depositAmount;
+
+        uint256 oldTotalHoldings = solidVault.totalHoldings();
+
+        solidVault.harvest();
+
+        // Verify yield was correctly transferred
+        uint256 yield = balanceThisHarvest > oldTotalHoldings ? balanceThisHarvest - oldTotalHoldings : 0;
+  
+        assertEq(yield, expectedYield);
+    }
+
+    function testFee() private {
+        uint depositAmount = 1 ether;
+
+        (bool success, ) = address(solidVault).call{value: depositAmount}("");
+
+        assertEq(solidVault.totalHoldings(), depositAmount);      
+        assertEq(solidVault.balanceOf(address(this)), depositAmount); 
+
+        IPool aaveLendingPool = IPool(aaveLendingPoolAddress);
+
+        address aWETHAddress = aaveLendingPool.getReserveData(address(weth)).aTokenAddress;
+        IAWETH aWETH = IAWETH(aWETHAddress);
+        assertEq(aWETH.balanceOf(address(solidVault)), depositAmount);
 
 
+        uint256 scaledBalanceBefore = aWETH.scaledBalanceOf(address(solidVault));
+        DataTypes.ReserveData memory reserveData = aaveLendingPool.getReserveData(address(weth));
 
+        // Advance the blockchain by a certain number of blocks to simulate time passing
+        vm.warp(block.timestamp + 365 days);
 
-    
+        // someone else deposits for the update of the liquidity index and interest (!)
+        vm.startPrank(address(owner));
+        weth.deposit{value: 1 ether}();
+        IERC20(weth).approve(address(aaveLendingPool), 1 ether);
+        aaveLendingPool.supply(address(weth), 1 ether, owner, 0);
+        
+        uint feePercent = 1e8;
+        solidVault.setFeePercent(feePercent);
+        assertEq(solidVault.feePercent(), feePercent);
+
+        uint256 oldTotalHoldings = solidVault.totalHoldings();
+        solidVault.harvest();
+
+        uint256 scaledBalance = aWETH.scaledBalanceOf(address(solidVault));
+        console.logUint(aaveLendingPool.getReserveData(address(weth)).liquidityIndex);
+        uint256 intermediateResult = FixedPointMathLib.mulWadDown(scaledBalance, aaveLendingPool.getReserveData(address(weth)).liquidityIndex);
+        uint balanceThisHarvest = FixedPointMathLib.mulDivDown(intermediateResult, 1e18, 1e27);
+        uint256 yield = balanceThisHarvest > oldTotalHoldings ? balanceThisHarvest - oldTotalHoldings : 0;
+        // Calculate the expected fee
+        uint256 expectedFee = FixedPointMathLib.mulDivDown(yield, feePercent, 1e18);
+
+        // Get the actual fee from SolidVault's own balance
+        uint256 actualFee = solidVault.balanceOf(address(solidVault));
+
+        // Check if the actual fee matches the expected fee
+        assertEq(actualFee, expectedFee);
+    }
 }
 
 
