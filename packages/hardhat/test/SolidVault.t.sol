@@ -7,6 +7,8 @@ import "solmate/src/tokens/WETH.sol";
 import { Vm } from 'forge-std/Vm.sol';
 import  { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import "../contracts/Interfaces/aave/IPool.sol";
+import {console} from "../lib/forge-std/src/console.sol";
+
 
 interface WETHInterface is IERC20 {
     function deposit() external payable;
@@ -18,23 +20,23 @@ contract SolidVaultTest is Test {
     SolidVault public solidVault;
     address owner = address(0x01);
     // MAINNET CONFIG
-    // WETHInterface weth = WETHInterface(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
-    // address aaveLendingPoolAddress = address(0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2); 
-    // address aaveRewards = address(0x8164Cc65827dcFe994AB23944CBC90e0aa80bFcb);
-    // address aweth = address(0x030bA81f1c18d280636F32af80b9AAd02Cf0854e);
+    WETHInterface weth = WETHInterface(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    address aaveLendingPoolAddress = address(0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2); 
+    address aaveRewards = address(0x8164Cc65827dcFe994AB23944CBC90e0aa80bFcb);
+    address aweth = address(0x030bA81f1c18d280636F32af80b9AAd02Cf0854e);
 
-    // function setUp() public {
-    //     solidVault = new SolidVault(ERC20(address(weth)), owner, aaveLendingPoolAddress, aaveRewards);
-    // }
-
-    // GOERLI CONFIG
-    WETHInterface weth = WETHInterface(0xCCB14936C2E000ED8393A571D15A2672537838Ad);
-    address aaveLendingPoolAddress = address(0x7b5C526B7F8dfdff278b4a3e045083FBA4028790); 
-    address aaveRewards = address(0xCCB14936C2E000ED8393A571D15A2672537838Ad);
-    address aweth = address(0xC93c704dCB45a70D6DA1011FfA48B3D5185201E0);
     function setUp() public {
         solidVault = new SolidVault(ERC20(address(weth)), owner, aaveLendingPoolAddress, aaveRewards);
     }
+
+    // GOERLI CONFIG
+    // WETHInterface weth = WETHInterface(0xCCB14936C2E000ED8393A571D15A2672537838Ad);
+    // address aaveLendingPoolAddress = address(0x7b5C526B7F8dfdff278b4a3e045083FBA4028790); 
+    // address aaveRewards = address(0xCCB14936C2E000ED8393A571D15A2672537838Ad);
+    // address aweth = address(0xC93c704dCB45a70D6DA1011FfA48B3D5185201E0);
+    // function setUp() public {
+    //     solidVault = new SolidVault(ERC20(address(weth)), owner, aaveLendingPoolAddress, aaveRewards);
+    // }
    
 
     function testConstructor() public {
@@ -46,7 +48,7 @@ contract SolidVaultTest is Test {
     }
 
 
-    function testETHDeposit() private {
+    function testETHDeposit() public {
         (bool success, ) = address(solidVault).call{value: 1 ether}("");
 
         assertEq(solidVault.totalHoldings(), 1 ether);      
@@ -59,15 +61,18 @@ contract SolidVaultTest is Test {
         assertEq(aWETH.balanceOf(address(solidVault)), 1 ether);
     }
 
-    function testETHDepositFuzz(uint amount) private {
-        amount = bound(amount, 0, address(this).balance);
+    function testETHDepositFuzz(uint amount) public {
+        amount = bound(amount, 0, 100 ether); // for goerli testing you can bound amount to address(this).balance
+
+        weth.approve(address(solidVault), amount);
+
         (bool success, ) = address(solidVault).call{value: amount}("");
 
         assertEq(solidVault.totalHoldings(), amount);      
         assertEq(solidVault.balanceOf(address(this)), amount); 
     }
 
-    function testWETHDeposit() private {
+    function testWETHDeposit() public {
         // wrap ETH
         weth.deposit{value: 1 ether}();
         uint256 initialWethBalance = weth.balanceOf(address(this));
@@ -99,7 +104,7 @@ contract SolidVaultTest is Test {
         assertEq(aWETH.balanceOf(address(solidVault)), 1 ether);
     }        
 
-    function testWithdraw() private {
+    function testWithdraw() public {
         weth.deposit{value: 1 ether}();
         // approve
         weth.approve(address(solidVault), 1 ether);
@@ -119,7 +124,7 @@ contract SolidVaultTest is Test {
     }
 
     function testWithdrawFuzz(uint amount) public {
-        amount = bound(amount, 0, address(this).balance); // for mainnet fork best to bound to a fixed amount, as Aave deposit otherwise can fail
+        amount = bound(amount, 0.001 ether, 100 ether); // not working on goerli
 
         (bool success, ) = address(solidVault).call{value: amount}("");
 
@@ -131,50 +136,53 @@ contract SolidVaultTest is Test {
         assertEq(solidVault.totalHoldings(), 0);
     }
 
-    function testMultipleUsers(address[] memory users) private {
-        uint totalDeposit = 0;
-    
-        for (uint i = 0; i < users.length; i++) {
-            address user = users[i];
-            uint randomAmount = bound((uint(keccak256(abi.encodePacked(user, block.timestamp))) % 1 ether), 0, 100 ether);
-            
-            // Send Ether to the user
-            (bool success,) = user.call{value: randomAmount}("");
-            require(success, "Transfer failed");
-            vm.startPrank(address(user));
 
-            // Each user wraps ETH and approves SolidVault
-            WETHInterface(weth).deposit{value: randomAmount}();
-            weth.approve(address(solidVault), randomAmount);
     
-            // Each user deposits on Aave
-            solidVault.deposit(randomAmount, user);
+    function testMultipleUsers() public {
+        address user1 = address(0x0a);
+        address user2 = address(0x0b);
+        uint amount = 1 ether;
 
-            totalDeposit += randomAmount;
-            vm.stopPrank();
-        }
-    
-        // Confirm total deposits
-        assertEq(solidVault.totalHoldings(), totalDeposit);
-    
-        for (uint i = 0; i < users.length; i++) {
-            address user = users[i];
-    
-            // Each user withdraws
-            uint shares = solidVault.balanceOf(user);
-            uint assets = solidVault.convertToAssets(shares);
-            solidVault.withdraw(assets, user, user);
-    
-            // Confirm each user's balance
-            assertEq(weth.balanceOf(user), assets);
-        }
-    
-        // Confirm total withdrawals
+        (bool success1, ) = user1.call{value: amount }("");
+        require(success1, "Transfer failed");
+        (bool success2, ) = user2.call{value: amount }("");
+        require(success2, "Transfer failed");
+
+        vm.startPrank(user1);
+        address(solidVault).call{value: 1 ether}("");
+        vm.stopPrank();
+        vm.startPrank(user2);
+        address(solidVault).call{value: 1 ether}("");
+        vm.stopPrank();
+
+        assertEq(solidVault.totalHoldings(), 2 ether);
+
+        vm.warp(block.timestamp + 30 days);
+
+        vm.startPrank(user1);
+        uint shares1 = solidVault.balanceOf(user1);
+        uint assets1 = solidVault.convertToAssets(shares1);
+        console.logString('assets1');
+        console.logUint(assets1);
+        solidVault.withdraw(assets1, user1, user1);
+        vm.stopPrank();
+        vm.startPrank(user2);
+        uint shares2 = solidVault.balanceOf(user2);
+        uint assets2 = solidVault.convertToAssets(shares2);
+        console.logString('assets2');
+        console.logUint(assets2);
+        solidVault.withdraw(assets2, user2, user2);
+        vm.stopPrank();
+   
+
         assertEq(solidVault.totalHoldings(), 0);
-    }
-    
 
-    function testHarvest() private {
+        assertEq(weth.balanceOf(address(user1)), 1 ether);
+        assertEq(weth.balanceOf(address(user2)), 1 ether);
+
+    }
+
+    function testHarvest() public {
         uint depositAmount = 1 ether;
 
         (bool success, ) = address(solidVault).call{value: depositAmount}("");
@@ -203,6 +211,7 @@ contract SolidVaultTest is Test {
         uint256 intermediateResult = FixedPointMathLib.mulWadDown(scaledBalance, aaveLendingPool.getReserveData(address(weth)).liquidityIndex);
         uint balanceThisHarvest = FixedPointMathLib.mulDivDown(intermediateResult, 1e18, 1e27);
 
+    
         uint256 expectedYield = balanceThisHarvest - depositAmount;
 
         uint256 oldTotalHoldings = solidVault.totalHoldings();
@@ -215,7 +224,7 @@ contract SolidVaultTest is Test {
         assertEq(yield, expectedYield);
     }
 
-    function testFee() private {
+    function testFee() public {
         uint depositAmount = 1 ether;
 
         (bool success, ) = address(solidVault).call{value: depositAmount}("");
