@@ -31,7 +31,7 @@ interface DepositProps {
 // TODO: Altering the depositValue to x number of decimal places breaks the app - needs investigating.
 
 export const Deposit = ({ apy }: DepositProps) => {
-  const { approve, allowance, isApproveProcessing } = useApprove();
+  const { approve, setApproveAmount, allowance, isApproveProcessing } = useApprove();
   const { wethBalance } = useWethBalance();
   const { ethBalance } = useEthBalance();
 
@@ -95,7 +95,10 @@ export const Deposit = ({ apy }: DepositProps) => {
               colorScheme="green"
               mb="2"
               width="100%"
-              onClick={() => approve(depositValue)}
+              onClick={() => {
+                setApproveAmount(depositValue);
+                approve(depositValue);
+              }}
               isLoading={isApproveProcessing}>
               Approve
             </Button>

@@ -45,8 +45,8 @@ export const useApprove = () => {
 
   const approve = async (amount: number) => {
     setApproveAmount(amount);
-    await wethApprove?.();
+    wethApprove?.();
   };
 
-  return { allowance, approve, isApproveProcessing };
+  return { allowance, approve, setApproveAmount, isApproveProcessing };
 };
